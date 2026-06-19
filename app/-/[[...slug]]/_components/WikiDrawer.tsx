@@ -10,11 +10,13 @@ import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import Toolbar from '@mui/material/Toolbar';
 import WikiHeader from './WikiHeader';
+import WikiDrawerTree from './WikiDrawerTree';
 
 const drawerWidth = 240;
 
 interface WikiDrawerProps extends PropsWithChildren {
-  breadcrumb: string[]
+  slugParts: string[]
+  relSlugs: string[]
 }
 
 export default function WikiDrawer(props: WikiDrawerProps) {
@@ -40,7 +42,7 @@ export default function WikiDrawer(props: WikiDrawerProps) {
     <div>
       <Toolbar />
       <Divider />
-      <p>Content Here...</p>
+      <WikiDrawerTree relSlugs={props.relSlugs} slugParts={props.slugParts} />
     </div>
   );
 
@@ -64,7 +66,7 @@ export default function WikiDrawer(props: WikiDrawerProps) {
           >
             <MenuIcon />
           </IconButton>
-          <WikiHeader breadcrumb={props.breadcrumb} />
+          <WikiHeader breadcrumb={props.slugParts} />
         </Toolbar>
       </AppBar>
       <Box
