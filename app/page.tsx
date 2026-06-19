@@ -1,9 +1,8 @@
-import AppDrawer from "@/components/AppDrawer";
+import Button from "@mui/material/Button";
+import NextLink from "@/components/NextLink";
 
 export default function Home() {
   return (
-    <AppDrawer>
-      <h1>Home</h1>
-    </AppDrawer>
+    <Button LinkComponent={NextLink} href={"/-"} variant="contained">Enter Wiki</Button>
   );
 }

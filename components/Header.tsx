@@ -1,8 +1,8 @@
 import { Button } from "@mui/material";
-import Link from "next/link";
+import NextLink from "@/components/NextLink";
 
 export default function Header() {
   return (
-    <Button LinkComponent={Link} href={"/"}>Wiki</Button>
+    <Button LinkComponent={NextLink} href={"/"}>Home</Button>
   )
 }
