@@ -1,8 +1,9 @@
 import AppDrawer from "@/components/AppDrawer";
 
-export default function WikiPage() {
+export default async function WikiPage(props: PageProps<'/-/[[...slug]]'>) {
+  const { slug } = await props.params
   return (
-    <AppDrawer>
+    <AppDrawer breadcrumb={slug ?? []}>
       <h1>Wiki Page</h1>
     </AppDrawer>
   );
