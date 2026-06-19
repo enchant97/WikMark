@@ -1,5 +1,9 @@
+import AppDrawer from "@/components/AppDrawer";
+
 export default function Home() {
   return (
-    <h1>Home</h1>
+    <AppDrawer>
+      <h1>Home</h1>
+    </AppDrawer>
   );
 }
