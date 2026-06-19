@@ -9,15 +9,15 @@ import Drawer from '@mui/material/Drawer';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import Toolbar from '@mui/material/Toolbar';
-import WikiHeader from '@/components/WikiHeader';
+import WikiHeader from './WikiHeader';
 
 const drawerWidth = 240;
 
-interface AppDrawerProps extends PropsWithChildren {
+interface WikiDrawerProps extends PropsWithChildren {
   breadcrumb: string[]
 }
 
-export default function AppDrawer(props: AppDrawerProps) {
+export default function WikiDrawer(props: WikiDrawerProps) {
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [isClosing, setIsClosing] = React.useState(false);
 

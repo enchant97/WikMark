@@ -1,8 +1,8 @@
-import AppDrawer from "@/components/AppDrawer";
+import WikiDrawer from "./_components/WikiDrawer";
 
 export default async function WikiPageLayout(props: LayoutProps<'/-/[[...slug]]'>) {
   const { slug } = await props.params
   return (
-    <AppDrawer breadcrumb={slug ?? []} >{props.children}</AppDrawer>
+    <WikiDrawer breadcrumb={slug ?? []} >{props.children}</WikiDrawer>
   )
 }
