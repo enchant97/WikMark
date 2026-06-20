@@ -6,6 +6,8 @@ import rehypeStringify from 'rehype-stringify'
 import remarkParse from 'remark-parse'
 import remarkRehype from 'remark-rehype'
 import { unified } from 'unified'
+import remarkFrontmatter from "remark-frontmatter";
+import remarkGfm from "remark-gfm";
 
 const INDEX_PAGE_NAME = "_index"
 
@@ -58,6 +60,8 @@ export async function getPageContentRaw(fullSlug: string) {
 export async function getPageContentAsHTML(fullSlug: string): Promise<string> {
   return String(await unified()
     .use(remarkParse)
+    .use(remarkFrontmatter)
+    .use(remarkGfm)
     .use(remarkRehype)
     .use(rehypeSanitize)
     .use(rehypeStringify)
