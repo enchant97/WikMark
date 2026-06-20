@@ -7,6 +7,9 @@ const env = createEnv({
   server: {
     WIKI_PATH: z.coerce.string().refine(isAbsolute, { error: "Expected an absolute path" }),
   },
+  client: {
+    NEXT_PUBLIC_ENABLE_LANDING: z.coerce.boolean().default(true),
+  },
   experimental__runtimeEnv: {
     NEXT_PUBLIC_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_PUBLISHABLE_KEY,
   },
