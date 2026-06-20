@@ -7,9 +7,15 @@ import remarkParse from 'remark-parse'
 import remarkRehype from 'remark-rehype'
 import { unified } from 'unified'
 
+const INDEX_PAGE_NAME = "_index"
+
 function isPathInside(child: string, parent: string): boolean {
   const relative = path.relative(parent, child)
   return relative !== "" && !relative.startsWith("..") && !path.isAbsolute(relative)
+}
+
+function isPathIndex(fullPath: string): boolean {
+  return fullPath === env.WIKI_PATH
 }
 
 function getFullPath(currentSlug: string): string {
@@ -22,21 +28,31 @@ function getFullPath(currentSlug: string): string {
 
 export async function* getChildrenBySlug(currentSlug: string): AsyncIterableIterator<string> {
   const fullPath = getFullPath(currentSlug)
+  const globOptions = { cwd: fullPath }
+  if (isPathIndex(fullPath)) {
+    globOptions.exclude = [`${INDEX_PAGE_NAME}.md`]
+  }
   try {
-    const results = glob("*.md", { cwd: fullPath })
+    const results = glob("*.md", globOptions)
     for await (const filename of results) {
       yield path.basename(filename, ".md")
     }
   } catch (err) {
-    if (!(await stat(`${fullPath}.md`)).isFile) {
+    const contentPath = isPathIndex(fullPath)
+      ? `${fullPath}/${INDEX_PAGE_NAME}.md`
+      : `${fullPath}.md`
+    if (!(await stat(contentPath)).isFile) {
       throw err
     }
   }
 }
 
 export async function getPageContentRaw(fullSlug: string) {
-  const contentPath = `${getFullPath(fullSlug)}.md`
-  return await readFile(contentPath)
+  const fullPath = `${getFullPath(fullSlug)}`
+  if (isPathIndex(fullPath)) {
+    return await readFile(`${fullPath}/${INDEX_PAGE_NAME}.md`)
+  }
+  return await readFile(`${fullPath}.md`)
 }
 
 export async function getPageContentAsHTML(fullSlug: string): Promise<string> {
