@@ -1,6 +1,6 @@
 import path from "node:path";
 import env from "@/env";
-import { stat, glob, readFile } from "node:fs/promises";
+import { stat, glob, readFile, writeFile } from "node:fs/promises";
 import rehypeSanitize from 'rehype-sanitize'
 import rehypeStringify from 'rehype-stringify'
 import remarkParse from 'remark-parse'
@@ -8,6 +8,7 @@ import remarkRehype from 'remark-rehype'
 import { unified } from 'unified'
 import remarkFrontmatter from "remark-frontmatter";
 import remarkGfm from "remark-gfm";
+import matter from "gray-matter";
 
 const INDEX_PAGE_NAME = "_index"
 
@@ -57,6 +58,28 @@ export async function getPageContentRaw(fullSlug: string) {
   return await readFile(`${fullPath}.md`)
 }
 
+export async function writePageContentRaw(fullSlug: string, rawContent: string) {
+  const pathSuffix = fullSlug === ""
+    ? `/${INDEX_PAGE_NAME}.md`
+    : ".md"
+  const fullPath = `${getFullPath(fullSlug)}${pathSuffix}`
+  await writeFile(fullPath, rawContent)
+}
+
+export interface PageContentParts {
+  content: string
+  metadata: Object
+}
+
+export async function getPageContentParts(fullSlug: string): Promise<PageContentParts> {
+  const contentRaw = await getPageContentRaw(fullSlug)
+  const out = matter(contentRaw)
+  return {
+    content: out.content,
+    metadata: out.data,
+  }
+}
+
 export async function getPageContentAsHTML(fullSlug: string): Promise<string> {
   return String(await unified()
     .use(remarkParse)
@@ -66,4 +89,9 @@ export async function getPageContentAsHTML(fullSlug: string): Promise<string> {
     .use(rehypeSanitize)
     .use(rehypeStringify)
     .process(await getPageContentRaw(fullSlug)))
+}
+
+export async function writePageContentParts(fullSlug: string, contentParts: PageContentParts) {
+  const contentRaw = matter.stringify(contentParts.content, contentParts.metadata)
+  writePageContentRaw(fullSlug, contentRaw)
 }
