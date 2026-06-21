@@ -1,14 +1,6 @@
+import WikiEditor from "./_components/WikiEditor";
 import { getPageContentAsHTML, getPageContentRaw } from "./_lib/data";
 import { joinSlugParts } from "./_lib/helpers";
-
-async function WikiPageEditor({ slugParts }: { slugParts: string[] }) {
-  const pageContent = await getPageContentRaw(joinSlugParts(slugParts))
-  return (
-    <>
-      <h1>Editor</h1>
-    </>
-  )
-}
 
 async function WikiPageViewer({ slugParts }: { slugParts: string[] }) {
   const pageContent = await getPageContentAsHTML(joinSlugParts(slugParts))
@@ -16,6 +8,17 @@ async function WikiPageViewer({ slugParts }: { slugParts: string[] }) {
     <>
       <h1>Wiki Page</h1>
       <div dangerouslySetInnerHTML={{ __html: pageContent }}></div>
+    </>
+  )
+}
+
+async function WikiPageEditor({ slugParts }: { slugParts: string[] }) {
+  const fullSlug = joinSlugParts(slugParts)
+  const initialContent = async () => (await getPageContentRaw(fullSlug)).toString()
+  return (
+    <>
+      <h1>Wiki Editor</h1>
+      <WikiEditor fullSlug={fullSlug} initialContent={initialContent()} />
     </>
   )
 }
