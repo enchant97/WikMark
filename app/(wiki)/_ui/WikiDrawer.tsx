@@ -11,17 +11,23 @@ import MenuIcon from '@mui/icons-material/Menu';
 import Toolbar from '@mui/material/Toolbar';
 import WikiHeader from './WikiHeader';
 import WikiDrawerTree from './WikiDrawerTree';
+import { useSelectedLayoutSegments } from 'next/navigation';
+import { joinSlugParts } from '@/lib/helpers';
+import { getRelPageSlugs } from '@/lib/actions';
+import useSWR from 'swr';
 
 const drawerWidth = 240;
 
-interface WikiDrawerProps extends PropsWithChildren {
-  slugParts: string[]
-  relSlugs: string[]
-}
-
-export default function WikiDrawer(props: WikiDrawerProps) {
+export default function WikiDrawer(props: PropsWithChildren) {
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [isClosing, setIsClosing] = React.useState(false);
+  const slugParts = useSelectedLayoutSegments().slice(1)
+  // TODO find a way of rendering tree on server-side
+  const { data: relPageSlugs } = useSWR(
+    ["relPageSlugs", slugParts],
+    () => getRelPageSlugs(joinSlugParts(slugParts)),
+    { fallbackData: [], suspense: true },
+  )
 
   const handleDrawerClose = () => {
     setIsClosing(true);
@@ -42,7 +48,7 @@ export default function WikiDrawer(props: WikiDrawerProps) {
     <div>
       <Toolbar />
       <Divider />
-      <WikiDrawerTree relSlugs={props.relSlugs} slugParts={props.slugParts} />
+      <WikiDrawerTree relSlugs={relPageSlugs} slugParts={slugParts} />
     </div>
   );
 
@@ -66,7 +72,7 @@ export default function WikiDrawer(props: WikiDrawerProps) {
           >
             <MenuIcon />
           </IconButton>
-          <WikiHeader breadcrumb={props.slugParts} />
+          <WikiHeader breadcrumb={slugParts} />
         </Toolbar>
       </AppBar>
       <Box

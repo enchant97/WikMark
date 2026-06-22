@@ -1,6 +1,10 @@
 "use server"
 
-import { writePageContentParts } from "./data"
+import { getChildrenBySlug, writePageContentParts } from "@/lib/data"
+
+export async function getRelPageSlugs(parentSlug: string): Promise<string[]> {
+  return await Array.fromAsync(getChildrenBySlug(parentSlug))
+}
 
 export async function updatePageContentsAction(
   _prevState: unknown,

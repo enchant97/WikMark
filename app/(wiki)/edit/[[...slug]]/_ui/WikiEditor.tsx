@@ -1,0 +1,49 @@
+"use client"
+import dynamic from "next/dynamic";
+import { startTransition, useActionState, useState } from "react";
+import { updatePageContentsAction } from "@/lib/actions";
+import { Button, ButtonGroup } from "@mui/material"
+import NextLink from "@/components/NextLink"
+import { HeaderMenu } from "@/app/(wiki)/_ui/WikiHeader";
+import { Save } from "@mui/icons-material";
+
+const Editor = dynamic(() => import("@/components/Editor"), { ssr: false })
+
+export default function WikiEditor(props: {
+  fullSlug: string,
+  initialContent: string,
+  metadata: Object,
+}) {
+  const [draftContent, setDraftContent] = useState(props.initialContent)
+  const [contentState, dispatchUpdateContent, updateContentPending] = useActionState(updatePageContentsAction, draftContent)
+  const isSaved = draftContent === contentState
+  return (
+    <>
+      <HeaderMenu>
+        <ButtonGroup>
+          <Button
+            color={isSaved ? "primary" : "warning"}
+            startIcon={<Save />}
+            loading={updateContentPending}
+            disabled={updateContentPending}
+            onClick={() => startTransition(() => dispatchUpdateContent({
+              fullSlug: props.fullSlug,
+              content: draftContent,
+              metadata: props.metadata,
+            }))}>
+            Save
+          </Button>
+          <Button LinkComponent={NextLink} href={`/-/${props.fullSlug}`}>Cancel</Button>
+        </ButtonGroup>
+      </HeaderMenu>
+      <Editor
+        pageId={props.fullSlug}
+        initialContent={props.initialContent}
+        isReadOnly={false}
+        onChange={(v) => {
+          setDraftContent(v)
+        }}
+      />
+    </>
+  )
+}
