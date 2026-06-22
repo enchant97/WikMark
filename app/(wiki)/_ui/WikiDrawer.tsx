@@ -21,7 +21,7 @@ const drawerWidth = 240;
 export default function WikiDrawer(props: PropsWithChildren) {
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [isClosing, setIsClosing] = React.useState(false);
-  const slugParts = useSelectedLayoutSegments().slice(1)
+  const slugParts = (useSelectedLayoutSegments()[1] ?? "").split("/")
   // TODO find a way of rendering tree on server-side
   const { data: relPageSlugs } = useSWR(
     ["relPageSlugs", slugParts],
