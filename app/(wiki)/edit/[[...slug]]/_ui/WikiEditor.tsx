@@ -21,6 +21,7 @@ export default function WikiEditor(props: {
     <>
       <HeaderMenu>
         <ButtonGroup>
+          <Button LinkComponent={NextLink} href={`/-/${props.fullSlug}`}>Cancel</Button>
           <Button
             color={isSaved ? "primary" : "warning"}
             startIcon={<Save />}
@@ -33,7 +34,6 @@ export default function WikiEditor(props: {
             }))}>
             Save
           </Button>
-          <Button LinkComponent={NextLink} href={`/-/${props.fullSlug}`}>Cancel</Button>
         </ButtonGroup>
       </HeaderMenu>
       <Editor
