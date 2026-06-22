@@ -1,9 +1,20 @@
 "use server"
 
-import { getChildrenBySlug, writePageContentParts } from "@/lib/data"
+import { createPage, getChildrenBySlug, writePageContentParts } from "@/lib/data"
 
 export async function getRelPageSlugs(parentSlug: string): Promise<string[]> {
   return await Array.fromAsync(getChildrenBySlug(parentSlug))
+}
+
+export async function createPageAction(_prevState: unknown, formData: FormData) {
+  const parentSlug = formData.get("parentSlug")
+  const slug = formData.get("slug")
+  const title = formData.get("title")
+  const fullSlug = await createPage(parentSlug, slug, { title })
+  return {
+    success: true,
+    fullSlug,
+  }
 }
 
 export async function updatePageContentsAction(

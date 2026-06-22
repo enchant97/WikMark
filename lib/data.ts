@@ -1,6 +1,6 @@
 import path from "node:path";
 import env from "@/env";
-import { stat, glob, readFile, writeFile } from "node:fs/promises";
+import { stat, glob, readFile, writeFile, mkdir } from "node:fs/promises";
 import rehypeSanitize from 'rehype-sanitize'
 import rehypeStringify from 'rehype-stringify'
 import remarkParse from 'remark-parse'
@@ -48,6 +48,20 @@ export async function* getChildrenBySlug(currentSlug: string): AsyncIterableIter
       throw err
     }
   }
+}
+
+export async function createPage(parentSlug: string, slug: string, metadata: Object) {
+  const rawContent = matter.stringify("", metadata)
+  if (parentSlug !== "") {
+    await mkdir(getFullPath(parentSlug), { recursive: true })
+  }
+  const fullSlug = parentSlug === "" ? slug : `${parentSlug}/${slug}`
+  const pathSuffix = fullSlug === ""
+    ? `/${INDEX_PAGE_NAME}.md`
+    : ".md"
+  const fullPath = `${getFullPath(fullSlug)}${pathSuffix}`
+  await writeFile(fullPath, rawContent, { flag: "wx" })
+  return fullSlug
 }
 
 export async function getPageContentRaw(fullSlug: string) {
