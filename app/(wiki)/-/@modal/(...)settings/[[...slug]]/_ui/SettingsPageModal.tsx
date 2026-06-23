@@ -1,6 +1,6 @@
 "use client"
 import { deletePageAction, updatePageSettingsAction } from "@/lib/actions"
-import useModalNavigation from "@/lib/useModalNavigation"
+import { useModalNavigation } from "@/lib/ModalNavigationContext"
 import { Alert, Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, TextField } from "@mui/material"
 import Form from "next/form"
 import { useRouter } from "next/navigation"

@@ -5,6 +5,7 @@ import { Roboto } from 'next/font/google';
 import { ThemeProvider } from '@mui/material/styles';
 import theme from '../theme';
 import CssBaseline from '@mui/material/CssBaseline';
+import { ModalNavigationProvider } from "@/lib/ModalNavigationContext";
 
 const roboto = Roboto({
   weight: ['300', '400', '500', '700'],
@@ -29,7 +30,9 @@ export default function RootLayout({
         <AppRouterCacheProvider options={{ enableCssLayer: true }}>
           <ThemeProvider theme={theme}>
             <CssBaseline enableColorScheme={true} />
-            {children}
+            <ModalNavigationProvider>
+              {children}
+            </ModalNavigationProvider>
           </ThemeProvider>
         </AppRouterCacheProvider>
       </body>
