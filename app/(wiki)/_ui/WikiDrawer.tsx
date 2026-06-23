@@ -18,10 +18,18 @@ import useSWR from 'swr';
 
 const drawerWidth = 240;
 
+function getSlugPartsFromLayoutSegments(): string[] {
+  let parts = (useSelectedLayoutSegments()[1] ?? "").split("/")
+  if (parts[0] == "") {
+    parts.pop()
+  }
+  return parts
+}
+
 export default function WikiDrawer(props: PropsWithChildren) {
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [isClosing, setIsClosing] = React.useState(false);
-  const slugParts = (useSelectedLayoutSegments()[1] ?? "").split("/")
+  const slugParts = getSlugPartsFromLayoutSegments()
   // TODO find a way of rendering tree on server-side
   const { data: relPageSlugs } = useSWR(
     ["relPageSlugs", slugParts],
