@@ -1,6 +1,6 @@
 import path from "node:path";
 import env from "@/env";
-import { stat, glob, readFile, writeFile, mkdir, rename } from "node:fs/promises";
+import { stat, glob, readFile, writeFile, mkdir, rename, rm } from "node:fs/promises";
 import rehypeSanitize from 'rehype-sanitize'
 import rehypeStringify from 'rehype-stringify'
 import remarkParse from 'remark-parse'
@@ -130,4 +130,15 @@ export async function renamePage(currentFullSlug: string, newFullSlug: string) {
     // move page children
     await rename(`${currentFullPath}`, `${newFullPath}`)
   } catch { }
+}
+
+export async function deletePage(fullSlug: string) {
+  const fullPath = getFullPath(fullSlug)
+  if (fullSlug === "") {
+    throw new Error("cannot delete index")
+  }
+  await Promise.allSettled([
+    rm(`${fullPath}.md`, { force: true }),
+    rm(fullPath, { recursive: true, force: true }),
+  ])
 }

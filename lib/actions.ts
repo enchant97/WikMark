@@ -1,6 +1,6 @@
 "use server"
 
-import { createPage, getChildrenBySlug, getPageContentParts, renamePage, writePageContentParts } from "@/lib/data"
+import { createPage, deletePage, getChildrenBySlug, getPageContentParts, renamePage, writePageContentParts } from "@/lib/data"
 
 export async function getRelPageSlugs(parentSlug: string): Promise<string[]> {
   return await Array.fromAsync(getChildrenBySlug(parentSlug))
@@ -56,4 +56,12 @@ export async function updatePageSettingsAction(_prevState: unknown, formData: Fo
     success: true,
     newFullSlug,
   }
+}
+
+export async function deletePageAction(_prevState: unknown, payload: { fullSlug: string }) {
+  if (payload.fullSlug === "") {
+    return { success: false }
+  }
+  //await deletePage(payload.fullSlug)
+  return { success: true }
 }

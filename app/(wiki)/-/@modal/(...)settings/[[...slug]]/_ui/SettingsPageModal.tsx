@@ -1,10 +1,10 @@
 "use client"
-import { updatePageSettingsAction } from "@/lib/actions"
+import { deletePageAction, updatePageSettingsAction } from "@/lib/actions"
 import useModalNavigation from "@/lib/useModalNavigation"
 import { Alert, Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, TextField } from "@mui/material"
 import Form from "next/form"
 import { useRouter } from "next/navigation"
-import { useActionState, useEffect, useState } from "react"
+import { startTransition, useActionState, useEffect, useState } from "react"
 
 export default function SettingsPageModal(props: { fullSlug: string, title: string }) {
   const isHomePath = props.fullSlug === ""
@@ -12,12 +12,16 @@ export default function SettingsPageModal(props: { fullSlug: string, title: stri
   const router = useRouter()
   const [open, setOpen] = useState(true)
   const [state, action] = useActionState(updatePageSettingsAction, null)
+  const [deleteState, dispatchDelete, deletePending] = useActionState(deletePageAction, null)
   useEffect(() => {
     if (state?.success) {
       setOpen(false)
       closeAndNavigate(`/-/${state.newFullSlug}`)
+    } else if (deleteState?.success) {
+      setOpen(false)
+      closeAndNavigate(`/-/${props.fullSlug.split("/").slice(0, -1).join("/")}`)
     }
-  }, [state])
+  }, [state, deleteState])
   const onClose = () => {
     setOpen(false)
     router.back()
@@ -72,9 +76,17 @@ export default function SettingsPageModal(props: { fullSlug: string, title: stri
           form="settingsPageForm"
           type="submit"
         >Save</Button>
-        <Button
-          color="error"
-        >Delete</Button>
+        {!isHomePath &&
+          <Button
+            loading={deletePending}
+            color="error"
+            onClick={() => {
+              startTransition(() => dispatchDelete({
+                fullSlug: props.fullSlug,
+              }))
+            }}
+          >Delete</Button>
+        }
       </DialogActions>
     </Dialog>
   )
