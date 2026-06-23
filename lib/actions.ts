@@ -62,6 +62,6 @@ export async function deletePageAction(_prevState: unknown, payload: { fullSlug:
   if (payload.fullSlug === "") {
     return { success: false }
   }
-  //await deletePage(payload.fullSlug)
+  await deletePage(payload.fullSlug)
   return { success: true }
 }
