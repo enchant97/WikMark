@@ -1,14 +1,8 @@
 import path from "node:path";
 import env from "@/env";
 import { stat, glob, readFile, writeFile, mkdir, rename, rm } from "node:fs/promises";
-import rehypeSanitize from 'rehype-sanitize'
-import rehypeStringify from 'rehype-stringify'
-import remarkParse from 'remark-parse'
-import remarkRehype from 'remark-rehype'
-import { unified } from 'unified'
-import remarkFrontmatter from "remark-frontmatter";
-import remarkGfm from "remark-gfm";
 import matter from "gray-matter";
+import { renderMarkdown } from "./helpers";
 
 const INDEX_PAGE_NAME = "_index"
 
@@ -95,14 +89,7 @@ export async function getPageContentParts(fullSlug: string): Promise<PageContent
 }
 
 export async function getPageContentAsHTML(fullSlug: string): Promise<string> {
-  return String(await unified()
-    .use(remarkParse)
-    .use(remarkFrontmatter)
-    .use(remarkGfm)
-    .use(remarkRehype)
-    .use(rehypeSanitize)
-    .use(rehypeStringify)
-    .process(await getPageContentRaw(fullSlug)))
+  return await renderMarkdown(await getPageContentRaw(fullSlug))
 }
 
 export async function writePageContentParts(fullSlug: string, contentParts: PageContentParts) {

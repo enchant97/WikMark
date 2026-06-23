@@ -1,14 +1,16 @@
-import { getPageContentAsHTML } from "@/lib/data"
+import { getPageContentParts } from "@/lib/data"
 import { joinSlugParts } from "@/lib/helpers"
 import { HeaderMenu } from "../../_ui/WikiHeader"
-import { Button, ButtonGroup } from "@mui/material"
+import { Button, ButtonGroup, Skeleton, Typography } from "@mui/material"
 import { EditDocument, NoteAdd, Settings } from "@mui/icons-material"
 import NextLink from "@/components/NextLink"
+import MarkdownRendered from "@/components/MarkdownRendered"
+import { Suspense } from "react"
 
 export default async function WikiViewPage(props: PageProps<"/-/[[...slug]]">) {
   const { slug } = await props.params
   const fullSlug = joinSlugParts(slug)
-  const pageContent = await getPageContentAsHTML(fullSlug)
+  const pageContentParts = await getPageContentParts(fullSlug)
 
   return (
     <>
@@ -19,8 +21,18 @@ export default async function WikiViewPage(props: PageProps<"/-/[[...slug]]">) {
           <Button startIcon={<EditDocument />} LinkComponent={NextLink} href={`/edit/${fullSlug}`}>Edit</Button>
         </ButtonGroup>
       </HeaderMenu>
-      <h1>Wiki Page</h1>
-      <div dangerouslySetInnerHTML={{ __html: pageContent }}></div>
+      <Suspense fallback={<>
+        <Typography variant="h1">
+          <Skeleton />
+        </Typography>
+        <Skeleton />
+        <Skeleton />
+        <Skeleton />
+      </>}>
+        {/* hiding the header until content load is a stylistic choice */}
+        <h1>{pageContentParts.metadata?.title ?? (slug?.at(-1) ?? "Home")}</h1>
+        <MarkdownRendered md={pageContentParts.content} />
+      </Suspense>
     </>
   )
 }
