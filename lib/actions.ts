@@ -1,7 +1,6 @@
 "use server"
 
 import { createPage, getChildrenBySlug, getPageContentParts, renamePage, writePageContentParts } from "@/lib/data"
-import { revalidatePath } from "next/cache"
 
 export async function getRelPageSlugs(parentSlug: string): Promise<string[]> {
   return await Array.fromAsync(getChildrenBySlug(parentSlug))

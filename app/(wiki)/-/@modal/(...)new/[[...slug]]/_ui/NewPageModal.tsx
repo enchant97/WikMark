@@ -1,18 +1,20 @@
 "use client"
 import { createPageAction } from "@/lib/actions";
+import useModalNavigation from "@/lib/useModalNavigation";
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, TextField } from "@mui/material";
 import Form from 'next/form'
 import { useRouter } from "next/navigation";
 import { useActionState, useEffect, useState } from "react";
 
 export default function NewPageModal(props: { parentSlug: string }) {
+  const { closeAndNavigate } = useModalNavigation()
   const router = useRouter()
   const [state, action] = useActionState(createPageAction, null)
   const [open, setOpen] = useState(true)
   useEffect(() => {
     if (state?.success) {
       setOpen(false)
-      router.push(`/-/${state.fullSlug}`)
+      closeAndNavigate(`/-/${state.fullSlug}`)
     }
   }, [state])
   const onClose = () => {

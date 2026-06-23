@@ -1,5 +1,6 @@
 "use client"
 import { updatePageSettingsAction } from "@/lib/actions"
+import useModalNavigation from "@/lib/useModalNavigation"
 import { Alert, Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, TextField } from "@mui/material"
 import Form from "next/form"
 import { useRouter } from "next/navigation"
@@ -7,13 +8,14 @@ import { useActionState, useEffect, useState } from "react"
 
 export default function SettingsPageModal(props: { fullSlug: string, title: string }) {
   const isHomePath = props.fullSlug === ""
+  const { closeAndNavigate } = useModalNavigation()
   const router = useRouter()
   const [open, setOpen] = useState(true)
   const [state, action] = useActionState(updatePageSettingsAction, null)
   useEffect(() => {
     if (state?.success) {
       setOpen(false)
-      router.push(`/-/${state.newFullSlug}`)
+      closeAndNavigate(`/-/${state.newFullSlug}`)
     }
   }, [state])
   const onClose = () => {
@@ -22,7 +24,7 @@ export default function SettingsPageModal(props: { fullSlug: string, title: stri
   }
   return (
     <Dialog open={open} onClose={onClose}>
-      <DialogTitle>Create Page</DialogTitle>
+      <DialogTitle>Page Settings</DialogTitle>
       <DialogContent>
         <Form id="settingsPageForm" action={action}>
           <input
