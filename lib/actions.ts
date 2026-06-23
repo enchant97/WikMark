@@ -1,6 +1,7 @@
 "use server"
 
-import { createPage, getChildrenBySlug, writePageContentParts } from "@/lib/data"
+import { createPage, getChildrenBySlug, getPageContentParts, renamePage, writePageContentParts } from "@/lib/data"
+import { revalidatePath } from "next/cache"
 
 export async function getRelPageSlugs(parentSlug: string): Promise<string[]> {
   return await Array.fromAsync(getChildrenBySlug(parentSlug))
@@ -30,4 +31,30 @@ export async function updatePageContentsAction(
     metadata: payload.metadata,
   })
   return payload.content
+}
+
+export async function updatePageSettingsAction(_prevState: unknown, formData: FormData) {
+  const currentFullSlug = formData.get("currentFullSlug")
+  const newFullSlug = formData.get("newFullSlug")
+  const title = formData.get("title")
+  // guard against moving home path
+  if (
+    (currentFullSlug === "" && newFullSlug !== "") ||
+    (currentFullSlug !== "" && newFullSlug === "")) {
+    return {
+      success: false,
+    }
+  }
+  // update metadata
+  const pageParts = await getPageContentParts(currentFullSlug)
+  Object.assign(pageParts.metadata, { ...pageParts.metadata, title })
+  await writePageContentParts(currentFullSlug, pageParts)
+  // perform rename if required
+  if (currentFullSlug !== newFullSlug) {
+    await renamePage(currentFullSlug, newFullSlug)
+  }
+  return {
+    success: true,
+    newFullSlug,
+  }
 }

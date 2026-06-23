@@ -15,8 +15,12 @@ export default function NewPageModal(props: { parentSlug: string }) {
       router.push(`/-/${state.fullSlug}`)
     }
   }, [state])
+  const onClose = () => {
+    setOpen(false)
+    router.back()
+  }
   return (
-    <Dialog open={open} onClose={() => router.back()}>
+    <Dialog open={open} onClose={onClose}>
       <DialogTitle>Create Page</DialogTitle>
       <DialogContent>
         <Form id="createPageForm" action={action}>
@@ -47,7 +51,7 @@ export default function NewPageModal(props: { parentSlug: string }) {
       </DialogContent>
       <DialogActions>
         <Button
-          onClick={() => router.back()}
+          onClick={onClose}
         >Cancel</Button>
         <Button
           form="createPageForm"

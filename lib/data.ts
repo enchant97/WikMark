@@ -1,6 +1,6 @@
 import path from "node:path";
 import env from "@/env";
-import { stat, glob, readFile, writeFile, mkdir } from "node:fs/promises";
+import { stat, glob, readFile, writeFile, mkdir, rename } from "node:fs/promises";
 import rehypeSanitize from 'rehype-sanitize'
 import rehypeStringify from 'rehype-stringify'
 import remarkParse from 'remark-parse'
@@ -108,4 +108,26 @@ export async function getPageContentAsHTML(fullSlug: string): Promise<string> {
 export async function writePageContentParts(fullSlug: string, contentParts: PageContentParts) {
   const contentRaw = matter.stringify(contentParts.content, contentParts.metadata)
   writePageContentRaw(fullSlug, contentRaw)
+}
+
+export async function renamePage(currentFullSlug: string, newFullSlug: string) {
+  const currentFullPath = getFullPath(currentFullSlug)
+  const newFullPath = getFullPath(newFullSlug)
+  // guard against renaming index
+  if (isPathIndex(currentFullPath)) {
+    throw new Error("cannot rename index")
+  }
+  if (isPathIndex(newFullSlug)) {
+    throw new Error("cannot rename to index")
+  }
+  // create parent folders
+  await mkdir(path.dirname(newFullPath), { recursive: true })
+  // move page
+  try {
+    await rename(`${currentFullPath}.md`, `${newFullPath}.md`)
+  } catch { }
+  try {
+    // move page children
+    await rename(`${currentFullPath}`, `${newFullPath}`)
+  } catch { }
 }
