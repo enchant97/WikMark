@@ -9,6 +9,7 @@ const env = createEnv({
   },
   client: {
     NEXT_PUBLIC_ENABLE_LANDING: z.coerce.boolean().default(true),
+    NEXT_PUBLIC_ENABLE_CLIENT_RENDERING: z.coerce.boolean().default(false),
   },
   experimental__runtimeEnv: {
     NEXT_PUBLIC_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_PUBLISHABLE_KEY,
