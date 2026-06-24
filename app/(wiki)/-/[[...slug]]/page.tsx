@@ -2,7 +2,7 @@ import { getPageContentParts } from "@/lib/data"
 import { joinSlugParts } from "@/lib/helpers"
 import { HeaderMenu } from "../../_ui/WikiHeader"
 import { Button, ButtonGroup } from "@mui/material"
-import { EditDocument, NoteAdd, Settings } from "@mui/icons-material"
+import { EditDocument, NoteAdd, PermMedia, Settings } from "@mui/icons-material"
 import NextLink from "@/components/NextLink"
 import RenderedPageServer from "./_ui/RenderedPageServer"
 import env from "@/env"
@@ -22,6 +22,7 @@ export default async function WikiViewPage(props: PageProps<"/-/[[...slug]]">) {
         <ButtonGroup>
           <Button startIcon={<NoteAdd />} LinkComponent={NextLink} href={`/new/${fullSlug}`}>New</Button>
           <Button startIcon={<Settings />} LinkComponent={NextLink} href={`/settings/${fullSlug}`}>Settings</Button>
+          <Button startIcon={<PermMedia />} LinkComponent={NextLink} href={`/assets/${fullSlug}`}>Assets</Button>
           <Button startIcon={<EditDocument />} LinkComponent={NextLink} href={`/edit/${fullSlug}`}>Edit</Button>
         </ButtonGroup>
       </HeaderMenu>

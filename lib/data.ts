@@ -44,6 +44,29 @@ export async function* getChildrenBySlug(currentSlug: string): AsyncIterableIter
   }
 }
 
+export async function* getPageAssetsBySlug(currentSlug: string): AsyncIterableIterator<string> {
+  const fullPath = getFullPath(currentSlug)
+  try {
+    const results = glob("*", {
+      cwd: fullPath,
+      exclude: ["*.md"],
+      withFileTypes: true
+    })
+    for await (const entry of results) {
+      if (entry.isFile()) {
+        yield entry.name
+      }
+    }
+  } catch (err) {
+    const contentPath = isPathIndex(fullPath)
+      ? `${fullPath}/${INDEX_PAGE_NAME}.md`
+      : `${fullPath}.md`
+    if (!(await stat(contentPath)).isFile) {
+      throw err
+    }
+  }
+}
+
 export async function createPage(parentSlug: string, slug: string, metadata: Object) {
   const rawContent = matter.stringify("", metadata)
   if (parentSlug !== "") {
@@ -56,6 +79,13 @@ export async function createPage(parentSlug: string, slug: string, metadata: Obj
   const fullPath = `${getFullPath(fullSlug)}${pathSuffix}`
   await writeFile(fullPath, rawContent, { flag: "wx" })
   return fullSlug
+}
+
+export async function createAsset(parentSlug: string, slug: string, rawContent: Blob) {
+  const parentFullPath = getFullPath(parentSlug)
+  const fullPath = `${parentFullPath}/${slug}`
+  await mkdir(parentFullPath, { recursive: true })
+  await writeFile(fullPath, await rawContent.bytes(), { flag: "wx" })
 }
 
 export async function getPageContentRaw(fullSlug: string) {
@@ -128,4 +158,17 @@ export async function deletePage(fullSlug: string) {
     rm(`${fullPath}.md`, { force: true }),
     rm(fullPath, { recursive: true, force: true }),
   ])
+}
+
+export async function deleteAsset(fullSlug: string) {
+  const fullPath = getFullPath(fullSlug)
+  if (fullPath === "" || path.extname(fullPath) === ".md") {
+    throw new Error("cannot delete pages")
+  }
+  await rm(fullPath, { force: true })
+}
+
+export async function getRawContent(fullSlug: string) {
+  const fullPath = getFullPath(fullSlug)
+  return await readFile(fullPath)
 }
