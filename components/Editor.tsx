@@ -11,7 +11,7 @@ export interface EditorProps {
   pageId: string,
   initialContent: string,
   isReadOnly: boolean,
-  onChange?: (content: string) => any
+  onChange?: (content: string) => unknown
 }
 
 function EditorCore({ pageId, initialContent, isReadOnly, onChange }: EditorProps) {

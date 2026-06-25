@@ -38,7 +38,7 @@ export async function updatePageContentsAction(
   payload: {
     fullSlug: string,
     content: string,
-    metadata: Object,
+    metadata: object,
   },
 ) {
   await writePageContentParts(payload.fullSlug, {

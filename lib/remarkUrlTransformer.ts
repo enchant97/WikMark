@@ -5,7 +5,7 @@ interface PluginOptions {
   transformer: (url: string) => string
 }
 
-export default function({ transformer }: PluginOptions) {
+export default function remarkUrlTransformer({ transformer }: PluginOptions) {
   function visitor(node: Node) {
     node.url = transformer(node.url)
   }

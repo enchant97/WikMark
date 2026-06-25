@@ -67,7 +67,7 @@ export async function* getPageAssetsBySlug(currentSlug: string): AsyncIterableIt
   }
 }
 
-export async function createPage(parentSlug: string, slug: string, metadata: Object) {
+export async function createPage(parentSlug: string, slug: string, metadata: object) {
   const rawContent = matter.stringify("", metadata)
   if (parentSlug !== "") {
     await mkdir(getFullPath(parentSlug), { recursive: true })
@@ -106,7 +106,7 @@ export async function writePageContentRaw(fullSlug: string, rawContent: string) 
 
 export interface PageContentParts {
   content: string
-  metadata: Object
+  metadata: object
 }
 
 export async function getPageContentParts(fullSlug: string): Promise<PageContentParts> {

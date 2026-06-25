@@ -20,7 +20,7 @@ export function slugPartsBase(parts?: string[]): string {
 }
 
 export function makeFullAssetSlug(parentSlug: string, assetSlug: string): string {
-  let parts = parentSlug.split("/")
+  const parts = parentSlug.split("/")
   if (parts[0] == "") { parts.pop() }
   return joinSlugParts([...parts, assetSlug])
 }

@@ -12,7 +12,7 @@ const Editor = dynamic(() => import("@/components/Editor"), { ssr: false })
 export default function WikiEditor(props: {
   fullSlug: string,
   initialContent: string,
-  metadata: Object,
+  metadata: object,
 }) {
   const [draftContent, setDraftContent] = useState(props.initialContent)
   const [contentState, dispatchUpdateContent, updateContentPending] = useActionState(updatePageContentsAction, draftContent)

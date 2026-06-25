@@ -7,7 +7,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 
 interface HeaderMenuContextType {
   menu: React.ReactNode | null
-  setMenu: (v: React.ReactNode | null) => any
+  setMenu: (v: React.ReactNode | null) => unknown
 }
 
 const HeaderMenuContext = createContext<HeaderMenuContextType | null>(null)
@@ -68,14 +68,18 @@ export default function WikiHeader(props: { breadcrumb: string[] }) {
           sx={{ display: 'flex', alignItems: 'center' }}
         ><HomeIcon fontSize="inherit" />
         </Link>
-        {props.breadcrumb.map((crumb, i) => (
-          <Link
-            color="inherit"
-            underline="hover"
-            component={NextLink}
-            href={`/-/${joinSlugParts(props.breadcrumb.slice(0, i + 1))}`}
-          >{crumb}</Link>
-        ))}
+        {props.breadcrumb.map((crumb, i) => {
+          const joinedCrumb = joinSlugParts(props.breadcrumb.slice(0, i + 1))
+          return (
+            <Link
+              key={joinedCrumb}
+              color="inherit"
+              underline="hover"
+              component={NextLink}
+              href={`/-/${joinedCrumb}`}
+            >{crumb}</Link>
+          )
+        })}
       </Breadcrumbs>
       {menu}
     </>
