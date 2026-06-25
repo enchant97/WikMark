@@ -19,7 +19,7 @@ export default function RenderedPageClient(props: { content: string, title: stri
       : <>
         {/* hiding the header until content load is a stylistic choice */}
         <h1>{props.title}</h1>
-        <div dangerouslySetInnerHTML={{ __html: rendered }}></div>
+        <div className="wikiProse" dangerouslySetInnerHTML={{ __html: rendered }}></div>
       </>
     }
     </>

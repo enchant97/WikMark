@@ -4,7 +4,7 @@ import RenderedPageLoading from "./RenderedPageLoading"
 
 async function Inner(props: { content: string }) {
   const rendered = await renderMarkdown(props.content)
-  return <div dangerouslySetInnerHTML={{ __html: rendered }}></div>
+  return <div className="wikiProse" dangerouslySetInnerHTML={{ __html: rendered }}></div>
 
 }
 

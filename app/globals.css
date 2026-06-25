@@ -1,0 +1,4 @@
+.wikiProse img {
+  width: 100%;
+  border-radius: var(--mui-shape-borderRadius);
+}
