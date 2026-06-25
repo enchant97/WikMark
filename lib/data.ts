@@ -1,6 +1,6 @@
 import path from "node:path";
 import env from "@/env";
-import { stat, glob, readFile, writeFile, mkdir, rename, rm } from "node:fs/promises";
+import * as fs from "node:fs/promises";
 import matter from "gray-matter";
 import { renderMarkdown } from "./helpers";
 
@@ -30,7 +30,7 @@ export async function* getChildrenBySlug(currentSlug: string): AsyncIterableIter
     globOptions.exclude = [`${INDEX_PAGE_NAME}.md`]
   }
   try {
-    const results = glob("*.md", globOptions)
+    const results = fs.glob("*.md", globOptions)
     for await (const filename of results) {
       yield path.basename(filename, ".md")
     }
@@ -38,7 +38,7 @@ export async function* getChildrenBySlug(currentSlug: string): AsyncIterableIter
     const contentPath = isPathIndex(fullPath)
       ? `${fullPath}/${INDEX_PAGE_NAME}.md`
       : `${fullPath}.md`
-    if (!(await stat(contentPath)).isFile) {
+    if (!(await fs.stat(contentPath)).isFile) {
       throw err
     }
   }
@@ -47,7 +47,7 @@ export async function* getChildrenBySlug(currentSlug: string): AsyncIterableIter
 export async function* getPageAssetsBySlug(currentSlug: string): AsyncIterableIterator<string> {
   const fullPath = getFullPath(currentSlug)
   try {
-    const results = glob("*", {
+    const results = fs.glob("*", {
       cwd: fullPath,
       exclude: ["*.md"],
       withFileTypes: true
@@ -61,7 +61,7 @@ export async function* getPageAssetsBySlug(currentSlug: string): AsyncIterableIt
     const contentPath = isPathIndex(fullPath)
       ? `${fullPath}/${INDEX_PAGE_NAME}.md`
       : `${fullPath}.md`
-    if (!(await stat(contentPath)).isFile) {
+    if (!(await fs.stat(contentPath)).isFile) {
       throw err
     }
   }
@@ -70,30 +70,30 @@ export async function* getPageAssetsBySlug(currentSlug: string): AsyncIterableIt
 export async function createPage(parentSlug: string, slug: string, metadata: object) {
   const rawContent = matter.stringify("", metadata)
   if (parentSlug !== "") {
-    await mkdir(getFullPath(parentSlug), { recursive: true })
+    await fs.mkdir(getFullPath(parentSlug), { recursive: true })
   }
   const fullSlug = parentSlug === "" ? slug : `${parentSlug}/${slug}`
   const pathSuffix = fullSlug === ""
     ? `/${INDEX_PAGE_NAME}.md`
     : ".md"
   const fullPath = `${getFullPath(fullSlug)}${pathSuffix}`
-  await writeFile(fullPath, rawContent, { flag: "wx" })
+  await fs.writeFile(fullPath, rawContent, { flag: "wx" })
   return fullSlug
 }
 
 export async function createAsset(parentSlug: string, slug: string, rawContent: Blob) {
   const parentFullPath = getFullPath(parentSlug)
   const fullPath = `${parentFullPath}/${slug}`
-  await mkdir(parentFullPath, { recursive: true })
-  await writeFile(fullPath, await rawContent.bytes(), { flag: "wx" })
+  await fs.mkdir(parentFullPath, { recursive: true })
+  await fs.writeFile(fullPath, await rawContent.bytes(), { flag: "wx" })
 }
 
 export async function getPageContentRaw(fullSlug: string) {
   const fullPath = `${getFullPath(fullSlug)}`
   if (isPathIndex(fullPath)) {
-    return await readFile(`${fullPath}/${INDEX_PAGE_NAME}.md`)
+    return await fs.readFile(`${fullPath}/${INDEX_PAGE_NAME}.md`)
   }
-  return await readFile(`${fullPath}.md`)
+  return await fs.readFile(`${fullPath}.md`)
 }
 
 export async function writePageContentRaw(fullSlug: string, rawContent: string) {
@@ -101,7 +101,7 @@ export async function writePageContentRaw(fullSlug: string, rawContent: string) 
     ? `/${INDEX_PAGE_NAME}.md`
     : ".md"
   const fullPath = `${getFullPath(fullSlug)}${pathSuffix}`
-  await writeFile(fullPath, rawContent)
+  await fs.writeFile(fullPath, rawContent)
 }
 
 export interface PageContentParts {
@@ -138,14 +138,14 @@ export async function renamePage(currentFullSlug: string, newFullSlug: string) {
     throw new Error("cannot rename to index")
   }
   // create parent folders
-  await mkdir(path.dirname(newFullPath), { recursive: true })
+  await fs.mkdir(path.dirname(newFullPath), { recursive: true })
   // move page
   try {
-    await rename(`${currentFullPath}.md`, `${newFullPath}.md`)
+    await fs.rename(`${currentFullPath}.md`, `${newFullPath}.md`)
   } catch { }
   try {
     // move page children
-    await rename(`${currentFullPath}`, `${newFullPath}`)
+    await fs.rename(`${currentFullPath}`, `${newFullPath}`)
   } catch { }
 }
 
@@ -155,8 +155,8 @@ export async function deletePage(fullSlug: string) {
     throw new Error("cannot delete index")
   }
   await Promise.allSettled([
-    rm(`${fullPath}.md`, { force: true }),
-    rm(fullPath, { recursive: true, force: true }),
+    fs.rm(`${fullPath}.md`, { force: true }),
+    fs.rm(fullPath, { recursive: true, force: true }),
   ])
 }
 
@@ -165,10 +165,10 @@ export async function deleteAsset(fullSlug: string) {
   if (fullPath === "" || path.extname(fullPath) === ".md") {
     throw new Error("cannot delete pages")
   }
-  await rm(fullPath, { force: true })
+  await fs.rm(fullPath, { force: true })
 }
 
 export async function getRawContent(fullSlug: string) {
   const fullPath = getFullPath(fullSlug)
-  return await readFile(fullPath)
+  return await fs.readFile(fullPath)
 }
