@@ -8,8 +8,8 @@ const env = createEnv({
     WIKI_PATH: z.coerce.string().refine(isAbsolute, { error: "Expected an absolute path" }),
   },
   client: {
-    NEXT_PUBLIC_ENABLE_LANDING: z.coerce.boolean().default(true),
-    NEXT_PUBLIC_ENABLE_CLIENT_RENDERING: z.coerce.boolean().default(false),
+    NEXT_PUBLIC_ENABLE_LANDING: z.stringbool().default(true),
+    NEXT_PUBLIC_ENABLE_CLIENT_RENDERING: z.stringbool().default(false),
     NEXT_PUBLIC_PUBLIC_URL: z.string().refine(
       (val) => {
         try {
