@@ -4,6 +4,8 @@ import { Crepe } from '@milkdown/crepe';
 import { Milkdown, MilkdownProvider, useEditor } from '@milkdown/react';
 import '@milkdown/crepe/theme/common/style.css';
 import "./Editor.css"
+import { pageContentUrlTransformer } from '@/lib/helpers';
+import urlTransformer from '@/lib/milkdownUrlTransformer';
 
 export interface EditorProps {
   pageId: string,
@@ -25,9 +27,13 @@ function EditorCore({ pageId, initialContent, isReadOnly, onChange }: EditorProp
       },
       featureConfigs: {
         [Crepe.Feature.Placeholder]: { text: 'Start writing here...' },
+        [Crepe.Feature.ImageBlock]: {
+          proxyDomURL: (url) => pageContentUrlTransformer(url)
+        },
       },
     });
 
+    crepe.editor.use(urlTransformer(pageContentUrlTransformer))
     crepe.setReadonly(isReadOnly);
 
     crepe.on((api) => {

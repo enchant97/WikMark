@@ -10,9 +10,21 @@ const env = createEnv({
   client: {
     NEXT_PUBLIC_ENABLE_LANDING: z.coerce.boolean().default(true),
     NEXT_PUBLIC_ENABLE_CLIENT_RENDERING: z.coerce.boolean().default(false),
+    NEXT_PUBLIC_PUBLIC_URL: z.string().refine(
+      (val) => {
+        try {
+          const url = new URL(val);
+          return url.protocol === 'http:' || url.protocol === 'https:';
+        } catch {
+          return false;
+        }
+      },
+      { message: 'Must be a valid http or https URL' }
+    ),
   },
   experimental__runtimeEnv: {
-    NEXT_PUBLIC_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_PUBLISHABLE_KEY,
+    NEXT_PUBLIC_PUBLIC_URL: process.env.NEXT_PUBLIC_PUBLIC_URL,
+    NEXT_PUBLIC_ENABLE_CLIENT_RENDERING: process.env.NEXT_PUBLIC_ENABLE_CLIENT_RENDERING,
   },
   emptyStringAsUndefined: true,
 })
