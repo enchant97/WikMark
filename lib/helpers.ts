@@ -25,6 +25,34 @@ export function makeFullAssetSlug(parentSlug: string, assetSlug: string): string
   return joinSlugParts([...parts, assetSlug])
 }
 
+export function isValidPageSlugPart(slug: string, options?: { allowIndex?: boolean }): boolean {
+  if (slug === "" && options?.allowIndex) { return true }
+  const pageSlugRegex = /^[a-zA-Z0-9-_]+$/
+  return pageSlugRegex.test(slug)
+}
+
+export function isValidAssetSlugPart(slug: string): boolean {
+  const assetSlugRegex = /^[a-zA-Z0-9-_]*(?:\.[a-zA-Z0-9]+)+$/
+  return assetSlugRegex.test(slug)
+}
+
+export function isValidPageSlugFull(slug: string, options?: { allowIndex?: boolean }): boolean {
+  if (slug === "" && options?.allowIndex) { return true }
+  const parts = slug.split("/")
+  for (const part of parts) {
+    if (!isValidPageSlugPart(part)) { return false }
+  }
+  return true
+}
+
+export function isValidAssetSlugFull(slug: string): boolean {
+  const parts = slug.split("/")
+  for (const part of parts) {
+    if (!isValidAssetSlugPart(part)) { return false }
+  }
+  return true
+}
+
 /**
  * Transform relative raw content oaths into correct api path
  */
