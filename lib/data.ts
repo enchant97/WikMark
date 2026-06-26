@@ -23,17 +23,25 @@ function getFullPath(currentSlug: string): string {
   return fullPath
 }
 
-export async function* getChildrenBySlug(currentSlug: string): AsyncIterableIterator<string> {
+export async function getChildrenBySlug(currentSlug: string): Promise<string[]> {
   const fullPath = getFullPath(currentSlug)
-  const globOptions = { cwd: fullPath }
+  const globOptions = {
+    cwd: fullPath,
+    withFileTypes: true,
+  }
   if (isPathIndex(fullPath)) {
     globOptions.exclude = [`${INDEX_PAGE_NAME}.md`]
   }
   try {
-    const results = fs.glob("*.md", globOptions)
-    for await (const filename of results) {
-      yield path.basename(filename, ".md")
+    const results = new Set<string>()
+    for await (const entry of fs.glob("*", globOptions)) {
+      if (entry.isFile() && path.extname(entry.name) === ".md") {
+        results.add(path.basename(entry.name, ".md"))
+      } else if (!entry.isFile()) {
+        results.add(path.basename(entry.name))
+      }
     }
+    return results.values().toArray()
   } catch (err) {
     const contentPath = isPathIndex(fullPath)
       ? `${fullPath}/${INDEX_PAGE_NAME}.md`
@@ -41,6 +49,7 @@ export async function* getChildrenBySlug(currentSlug: string): AsyncIterableIter
     if (!(await fs.stat(contentPath)).isFile) {
       throw err
     }
+    return []
   }
 }
 
@@ -91,9 +100,26 @@ export async function createAsset(parentSlug: string, slug: string, rawContent: 
 export async function getPageContentRaw(fullSlug: string) {
   const fullPath = `${getFullPath(fullSlug)}`
   if (isPathIndex(fullPath)) {
-    return await fs.readFile(`${fullPath}/${INDEX_PAGE_NAME}.md`)
+    try {
+      return await fs.readFile(`${fullPath}/${INDEX_PAGE_NAME}.md`)
+    } catch (err) {
+      if (err.code === "ENOENT") {
+        return Buffer.alloc(0)
+      }
+      throw err
+    }
   }
-  return await fs.readFile(`${fullPath}.md`)
+  try {
+    return await fs.readFile(`${fullPath}.md`)
+  } catch (err) {
+    if (err.code === "ENOENT") {
+      const stat = await fs.stat(fullPath)
+      if (stat.isDirectory()) {
+        return Buffer.alloc(0)
+      }
+    }
+    throw err
+  }
 }
 
 export async function writePageContentRaw(fullSlug: string, rawContent: string) {

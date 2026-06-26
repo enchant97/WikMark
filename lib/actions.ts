@@ -4,7 +4,7 @@ import { createAsset, createPage, deleteAsset, deletePage, getChildrenBySlug, ge
 import { revalidatePath } from "next/cache"
 
 export async function getRelPageSlugs(parentSlug: string): Promise<string[]> {
-  return await Array.fromAsync(getChildrenBySlug(parentSlug))
+  return await getChildrenBySlug(parentSlug)
 }
 
 export async function getPageAssets(fullSlug: string): Promise<string[]> {
