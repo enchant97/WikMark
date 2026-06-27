@@ -1,5 +1,6 @@
 "use client"
 
+import { InlineSuccessAlert, InlineAppErrorAlert } from "@/components/InlineAlert"
 import { createAssetAction, deleteAssetAction } from "@/lib/actions"
 import { makeFullAssetSlug } from "@/lib/helpers"
 import { CloudUpload, DeleteForever } from "@mui/icons-material"
@@ -11,10 +12,11 @@ import { startTransition, Suspense, use, useActionState, useRef, useState } from
 export default function AssetsModal(props: { fullSlug: string, assets: Promise<string[]> }) {
   const router = useRouter()
   const [open, setOpen] = useState(true)
-  const [_deleteState, dispatchDelete, deletePending] = useActionState(deleteAssetAction, null)
-  const [_createState, dispatchCreate, createPending] = useActionState(createAssetAction, null)
+  const [deleteState, dispatchDelete, deletePending] = useActionState(deleteAssetAction, null)
+  const [createState, dispatchCreate, createPending] = useActionState(createAssetAction, null)
   const [deleting, setDeleting] = useState<string | null>(null)
   const createFormRef = useRef<HTMLFormElement | null>(null)
+  const globalPending = deletePending || createPending
 
   const onClose = () => {
     setOpen(false)
@@ -45,6 +47,7 @@ export default function AssetsModal(props: { fullSlug: string, assets: Promise<s
             tabIndex={-1}
             startIcon={<CloudUpload />}
             loading={createPending}
+            disabled={globalPending}
           >
             Upload New Asset
             <input
@@ -65,6 +68,7 @@ export default function AssetsModal(props: { fullSlug: string, assets: Promise<s
                   color="error"
                   onClick={() => onDelete(assetSlug)}
                   loading={deleting === assetSlug && deletePending}
+                  disabled={globalPending}
                 >
                   <DeleteForever />
                 </IconButton>
@@ -79,6 +83,10 @@ export default function AssetsModal(props: { fullSlug: string, assets: Promise<s
             </ListItem>
           ))}
         </List>
+        {(deleteState?.error && !globalPending) && <InlineAppErrorAlert err={deleteState.error} />}
+        {(createState?.error && !globalPending) && <InlineAppErrorAlert err={createState.error} />}
+        {(deleteState?.success && !globalPending) && <InlineSuccessAlert message={"deleted asset"} />}
+        {(createState?.success && !globalPending) && <InlineSuccessAlert message={"added asset"} />}
       </>
     )
   }
@@ -98,6 +106,7 @@ export default function AssetsModal(props: { fullSlug: string, assets: Promise<s
       <DialogActions>
         <Button
           onClick={onClose}
+          disabled={globalPending}
         >Close</Button>
       </DialogActions>
     </Dialog>

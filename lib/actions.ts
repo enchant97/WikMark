@@ -2,6 +2,8 @@
 
 import { createAsset, createPage, deleteAsset, deletePage, getChildrenBySlug, getPageAssetsBySlug, getPageContentParts, renamePage, writePageContentParts } from "@/lib/data"
 import { revalidatePath } from "next/cache"
+import { AppError, AppErrorCode } from "./errors"
+import { success } from "zod"
 
 export async function getRelPageSlugs(parentSlug: string): Promise<string[]> {
   return await getChildrenBySlug(parentSlug)
@@ -24,12 +26,22 @@ export async function createPageAction(_prevState: unknown, formData: FormData) 
 
 export async function createAssetAction(_prevState: unknown, formData: FormData) {
   const parentSlug = formData.get("parentSlug")?.toString()
-  const file = formData.get("file")?.valueOf() as File
-  await createAsset(parentSlug, file.name, file)
-  revalidatePath("/assets")
-  return {
-    success: true,
-    slug: file.name,
+  const file = formData.get("file")?.valueOf()
+  try {
+    if (parentSlug === undefined || (file === undefined || !(file instanceof File))) {
+      throw new AppError("form missing required fields", AppErrorCode.Validation)
+    }
+    await createAsset(parentSlug, file.name, file)
+    revalidatePath("/assets")
+    return {
+      success: true,
+      slug: file.name,
+    }
+  } catch (err) {
+    if (err instanceof AppError) {
+      return { error: err.intoDTO() }
+    }
+    throw err
   }
 }
 
@@ -83,7 +95,17 @@ export async function deletePageAction(_prevState: unknown, payload: { fullSlug:
 }
 
 export async function deleteAssetAction(_prevState: unknown, payload: { fullSlug: string }) {
-  await deleteAsset(payload.fullSlug)
-  revalidatePath("/assets")
-  return { success: true }
+  try {
+    await deleteAsset(payload.fullSlug)
+    revalidatePath("/assets")
+    return {
+      success: true,
+    }
+  }
+  catch (err) {
+    if (err instanceof AppError) {
+      return { error: err.intoDTO() }
+    }
+    throw err
+  }
 }
