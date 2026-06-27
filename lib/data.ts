@@ -66,9 +66,13 @@ export async function getChildrenBySlug(currentSlug: string): Promise<string[]> 
     const results = new Set<string>()
     for await (const entry of fs.glob("*", globOptions)) {
       if (entry.isFile() && path.extname(entry.name) === ".md") {
-        results.add(path.basename(entry.name, ".md"))
+        const slug = path.basename(entry.name, ".md")
+        if (isValidPageSlugPart(slug))
+          results.add(slug)
       } else if (!entry.isFile()) {
-        results.add(path.basename(entry.name))
+        const slug = path.basename(entry.name)
+        if (isValidPageSlugPart(slug))
+          results.add(slug)
       }
     }
     return results.values().toArray()
@@ -104,7 +108,7 @@ export async function* getPageAssetsBySlug(currentSlug: string): AsyncIterableIt
       withFileTypes: true
     })
     for await (const entry of results) {
-      if (entry.isFile()) {
+      if (entry.isFile() && isValidAssetSlugPart(entry.name)) {
         yield entry.name
       }
     }
