@@ -6,6 +6,7 @@ import { Button, ButtonGroup } from "@mui/material"
 import NextLink from "@/components/NextLink"
 import { HeaderMenu } from "@/app/(wiki)/_ui/WikiHeader";
 import { Save } from "@mui/icons-material";
+import { InlineAppErrorAlert } from "@/components/InlineAlert";
 
 const Editor = dynamic(() => import("@/components/Editor"), { ssr: false })
 
@@ -15,8 +16,9 @@ export default function WikiEditor(props: {
   metadata: object,
 }) {
   const [draftContent, setDraftContent] = useState(props.initialContent)
-  const [contentState, dispatchUpdateContent, updateContentPending] = useActionState(updatePageContentsAction, draftContent)
-  const isSaved = draftContent === contentState
+  const [savedContent, setSavedContent] = useState(props.initialContent)
+  const [contentState, dispatchUpdateContent, updateContentPending] = useActionState(updatePageContentsAction, null)
+  const isSaved = draftContent === savedContent && !updateContentPending
   return (
     <>
       <HeaderMenu>
@@ -27,15 +29,19 @@ export default function WikiEditor(props: {
             startIcon={<Save />}
             loading={updateContentPending}
             disabled={updateContentPending}
-            onClick={() => startTransition(() => dispatchUpdateContent({
-              fullSlug: props.fullSlug,
-              content: draftContent,
-              metadata: props.metadata,
-            }))}>
+            onClick={() => {
+              setSavedContent(draftContent)
+              startTransition(() => dispatchUpdateContent({
+                fullSlug: props.fullSlug,
+                content: draftContent,
+                metadata: props.metadata,
+              }))
+            }}>
             Save
           </Button>
         </ButtonGroup>
       </HeaderMenu>
+      {(contentState?.error && !updateContentPending) && <InlineAppErrorAlert err={contentState.error} />}
       <Editor
         pageId={props.fullSlug}
         initialContent={props.initialContent}

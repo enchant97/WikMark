@@ -3,7 +3,6 @@
 import { createAsset, createPage, deleteAsset, deletePage, getChildrenBySlug, getPageAssetsBySlug, getPageContentParts, renamePage, writePageContentParts } from "@/lib/data"
 import { revalidatePath } from "next/cache"
 import { AppError, AppErrorCode } from "./errors"
-import { success } from "zod"
 
 export async function getRelPageSlugs(parentSlug: string): Promise<string[]> {
   return await getChildrenBySlug(parentSlug)
@@ -14,13 +13,23 @@ export async function getPageAssets(fullSlug: string): Promise<string[]> {
 }
 
 export async function createPageAction(_prevState: unknown, formData: FormData) {
-  const parentSlug = formData.get("parentSlug")
-  const slug = formData.get("slug")
-  const title = formData.get("title")
-  const fullSlug = await createPage(parentSlug, slug, { title })
-  return {
-    success: true,
-    fullSlug,
+  const parentSlug = formData.get("parentSlug")?.toString()
+  const slug = formData.get("slug")?.toString()
+  const title = formData.get("title")?.toString()
+  try {
+    if (parentSlug === undefined || slug === undefined || title === undefined) {
+      throw new AppError("form missing required fields", AppErrorCode.Validation)
+    }
+    const fullSlug = await createPage(parentSlug, slug, { title })
+    return {
+      success: true,
+      fullSlug,
+    }
+  } catch (err) {
+    if (err instanceof AppError) {
+      return { error: err.intoDTO() }
+    }
+    throw err
   }
 }
 
@@ -53,45 +62,60 @@ export async function updatePageContentsAction(
     metadata: object,
   },
 ) {
-  await writePageContentParts(payload.fullSlug, {
-    content: payload.content,
-    metadata: payload.metadata,
-  })
-  return payload.content
+  try {
+    await writePageContentParts(payload.fullSlug, {
+      content: payload.content,
+      metadata: payload.metadata,
+    })
+    return {
+      success: true,
+    }
+  } catch (err) {
+    if (err instanceof AppError) {
+      return { error: err.intoDTO() }
+    }
+    throw err
+  }
 }
 
 export async function updatePageSettingsAction(_prevState: unknown, formData: FormData) {
-  const currentFullSlug = formData.get("currentFullSlug")
-  const newFullSlug = formData.get("newFullSlug")
-  const title = formData.get("title")
-  // guard against moving home path
-  if (
-    (currentFullSlug === "" && newFullSlug !== "") ||
-    (currentFullSlug !== "" && newFullSlug === "")) {
-    return {
-      success: false,
+  const currentFullSlug = formData.get("currentFullSlug")?.toString()
+  const newFullSlug = formData.get("newFullSlug")?.toString()
+  const title = formData.get("title")?.toString()
+  try {
+    if (currentFullSlug === undefined || newFullSlug === undefined || title === undefined) {
+      throw new AppError("form missing required fields", AppErrorCode.Validation)
     }
-  }
-  // update metadata
-  const pageParts = await getPageContentParts(currentFullSlug)
-  Object.assign(pageParts.metadata, { ...pageParts.metadata, title })
-  await writePageContentParts(currentFullSlug, pageParts)
-  // perform rename if required
-  if (currentFullSlug !== newFullSlug) {
-    await renamePage(currentFullSlug, newFullSlug)
-  }
-  return {
-    success: true,
-    newFullSlug,
+    // update metadata
+    const pageParts = await getPageContentParts(currentFullSlug)
+    Object.assign(pageParts.metadata, { ...pageParts.metadata, title })
+    await writePageContentParts(currentFullSlug, pageParts)
+    // perform rename if required
+    if (currentFullSlug !== newFullSlug) {
+      await renamePage(currentFullSlug, newFullSlug)
+    }
+    return {
+      success: true,
+      newFullSlug,
+    }
+  } catch (err) {
+    if (err instanceof AppError) {
+      return { error: err.intoDTO() }
+    }
+    throw err
   }
 }
 
 export async function deletePageAction(_prevState: unknown, payload: { fullSlug: string }) {
-  if (payload.fullSlug === "") {
-    return { success: false }
+  try {
+    await deletePage(payload.fullSlug)
+    return { success: true }
+  } catch (err) {
+    if (err instanceof AppError) {
+      return { error: err.intoDTO() }
+    }
+    throw err
   }
-  await deletePage(payload.fullSlug)
-  return { success: true }
 }
 
 export async function deleteAssetAction(_prevState: unknown, payload: { fullSlug: string }) {

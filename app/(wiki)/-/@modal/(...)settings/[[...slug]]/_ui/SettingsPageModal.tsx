@@ -1,4 +1,5 @@
 "use client"
+import { InlineAppErrorAlert, InlineSuccessAlert } from "@/components/InlineAlert"
 import { deletePageAction, updatePageSettingsAction } from "@/lib/actions"
 import { useModalNavigation } from "@/lib/ModalNavigationContext"
 import { Alert, Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, TextField } from "@mui/material"
@@ -11,17 +12,16 @@ export default function SettingsPageModal(props: { fullSlug: string, title: stri
   const { closeAndNavigate } = useModalNavigation()
   const router = useRouter()
   const [open, setOpen] = useState(true)
-  const [state, action] = useActionState(updatePageSettingsAction, null)
+  const [updateState, dispatchUpdate, updatePending] = useActionState(updatePageSettingsAction, null)
   const [deleteState, dispatchDelete, deletePending] = useActionState(deletePageAction, null)
+  const globalPending = updatePending || deletePending
+
   useEffect(() => {
-    if (state?.success) {
-      setOpen(false)
-      closeAndNavigate(`/-/${state.newFullSlug}`)
-    } else if (deleteState?.success) {
+    if (deleteState?.success) {
       setOpen(false)
       closeAndNavigate(`/-/${props.fullSlug.split("/").slice(0, -1).join("/")}`)
     }
-  }, [state, deleteState])
+  }, [deleteState])
   const onClose = () => {
     setOpen(false)
     router.back()
@@ -30,7 +30,7 @@ export default function SettingsPageModal(props: { fullSlug: string, title: stri
     <Dialog open={open} onClose={onClose}>
       <DialogTitle>Page Settings</DialogTitle>
       <DialogContent>
-        <Form id="settingsPageForm" action={action}>
+        <Form id="settingsPageForm" action={dispatchUpdate}>
           <input
             name="currentFullSlug"
             type="hidden"
@@ -67,18 +67,25 @@ export default function SettingsPageModal(props: { fullSlug: string, title: stri
             }
           </Stack>
         </Form>
+        {(deleteState?.error && !globalPending) && <InlineAppErrorAlert err={deleteState.error} />}
+        {(updateState?.error && !globalPending) && <InlineAppErrorAlert err={updateState.error} />}
+        {(updateState?.success && !globalPending) && <InlineSuccessAlert message={"updated page"} />}
       </DialogContent>
       <DialogActions>
         <Button
+          disabled={globalPending}
           onClick={onClose}
         >Cancel</Button>
         <Button
+          disabled={globalPending}
+          loading={updatePending}
           form="settingsPageForm"
           type="submit"
         >Save</Button>
         {!isHomePath &&
           <Button
             loading={deletePending}
+            disabled={globalPending}
             color="error"
             onClick={() => {
               startTransition(() => dispatchDelete({
