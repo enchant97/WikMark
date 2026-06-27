@@ -137,6 +137,8 @@ export async function createPage(parentSlug: string, slug: string, metadata: obj
     throw new AppError(`invalid slug given: '${parentSlug}'`, AppErrorCode.Validation)
   } else if (!isValidPageSlugPart(slug)) {
     throw new AppError(`invalid slug given: '${slug}'`, AppErrorCode.Validation)
+  } else if (parentSlug === "" && slug === INDEX_PAGE_NAME) {
+    throw new AppError(`invalid slug given: '${slug}'`, AppErrorCode.Validation)
   }
   const rawContent = matter.stringify("", metadata)
   if (parentSlug !== "") {
@@ -147,7 +149,16 @@ export async function createPage(parentSlug: string, slug: string, metadata: obj
     ? `/${INDEX_PAGE_NAME}.md`
     : ".md"
   const fullPath = `${getFullPath(fullSlug)}${pathSuffix}`
-  await fs.writeFile(fullPath, rawContent, { flag: "wx" })
+  try {
+    await fs.writeFile(fullPath, rawContent, { flag: "wx" })
+  } catch (err) {
+    if (err.code === "EEXIST") {
+      throw new AppError(
+        `page already exists with that slug: ${slug}`,
+        AppErrorCode.Conflict,
+        { cause: err })
+    }
+  }
   return fullSlug
 }
 
@@ -166,7 +177,17 @@ export async function createAsset(parentSlug: string, slug: string, rawContent: 
   const parentFullPath = getFullPath(parentSlug)
   const fullPath = `${parentFullPath}/${slug}`
   await fs.mkdir(parentFullPath, { recursive: true })
-  await fs.writeFile(fullPath, await rawContent.bytes(), { flag: "wx" })
+  try {
+    await fs.writeFile(fullPath, await rawContent.bytes(), { flag: "wx" })
+  }
+  catch (err) {
+    if (err.code === "EEXIST") {
+      throw new AppError(
+        `asset already exists with that slug: ${slug}`,
+        AppErrorCode.Conflict,
+        { cause: err })
+    }
+  }
 }
 
 /**
@@ -279,9 +300,17 @@ export async function renamePage(currentFullSlug: string, newFullSlug: string) {
     throw new AppError(`invalid slug given: '${currentFullSlug}'`, AppErrorCode.Validation)
   } else if (!isValidPageSlugFull(newFullSlug, { allowIndex: false })) {
     throw new AppError(`invalid slug given: '${newFullSlug}'`, AppErrorCode.Validation)
+  } else if (newFullSlug === INDEX_PAGE_NAME) {
+    throw new AppError(`invalid slug given: '${newFullSlug}'`, AppErrorCode.Validation)
   }
   const currentFullPath = getFullPath(currentFullSlug)
   const newFullPath = getFullPath(newFullSlug)
+  // check if page already exists at new location
+  if (await doesFileExist(`${newFullPath}.md`)) {
+    throw new AppError(
+      `cannot overwrite existing page: ${newFullSlug}`,
+      AppErrorCode.Conflict)
+  }
   // create parent folders
   await fs.mkdir(path.dirname(newFullPath), { recursive: true })
   // move page

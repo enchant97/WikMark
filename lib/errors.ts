@@ -2,6 +2,7 @@ export enum AppErrorCode {
   Unknown = "UNKNOWN",
   Validation = "VALIDATION",
   NotFound = "NOT_FOUND",
+  Conflict = "CONFLICT",
 }
 
 export interface ErrorDTO {
