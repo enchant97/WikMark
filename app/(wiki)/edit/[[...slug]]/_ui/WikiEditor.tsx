@@ -2,11 +2,12 @@
 import dynamic from "next/dynamic";
 import { startTransition, useActionState, useState } from "react";
 import { updatePageContentsAction } from "@/lib/actions";
-import { Button, ButtonGroup } from "@mui/material"
+import { ButtonGroup } from "@mui/material"
 import NextLink from "@/components/NextLink"
 import { HeaderMenu } from "@/app/(wiki)/_ui/WikiHeader";
-import { Save } from "@mui/icons-material";
+import { Cancel, Save } from "@mui/icons-material";
 import { InlineAppErrorAlert } from "@/components/InlineAlert";
+import ResponsiveButton from "@/components/ResponsiveButton";
 
 const Editor = dynamic(() => import("@/components/Editor"), { ssr: false })
 
@@ -23,8 +24,8 @@ export default function WikiEditor(props: {
     <>
       <HeaderMenu>
         <ButtonGroup>
-          <Button LinkComponent={NextLink} href={`/-/${props.fullSlug}`}>Cancel</Button>
-          <Button
+          <ResponsiveButton startIcon={<Cancel />} LinkComponent={NextLink} href={`/-/${props.fullSlug}`}>Cancel</ResponsiveButton>
+          <ResponsiveButton
             color={isSaved ? "primary" : "warning"}
             startIcon={<Save />}
             loading={updateContentPending}
@@ -38,7 +39,7 @@ export default function WikiEditor(props: {
               }))
             }}>
             Save
-          </Button>
+          </ResponsiveButton>
         </ButtonGroup>
       </HeaderMenu>
       {(contentState?.error && !updateContentPending) && <InlineAppErrorAlert err={contentState.error} />}

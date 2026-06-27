@@ -58,7 +58,14 @@ export default function WikiHeader(props: { breadcrumb: string[] }) {
   const { menu } = useHeaderMenu()
   return (
     <>
-      <Breadcrumbs aria-label="breadcrumb" sx={{ flexGrow: 1 }}>
+      <Breadcrumbs
+        aria-label="breadcrumb"
+        sx={{
+          flexGrow: 1,
+          overflowX: "auto",
+          "& ol": { flexWrap: 'nowrap' },
+          "& li": { whiteSpace: "nowrap" },
+        }}>
         {/* TODO add aria-current="page" support and primary text color */}
         <Link
           color="inherit"

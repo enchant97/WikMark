@@ -1,12 +1,13 @@
 import { getPageContentParts } from "@/lib/data"
 import { joinSlugParts } from "@/lib/helpers"
 import { HeaderMenu } from "../../_ui/WikiHeader"
-import { Button, ButtonGroup } from "@mui/material"
+import { ButtonGroup } from "@mui/material"
 import { EditDocument, NoteAdd, PermMedia, Settings } from "@mui/icons-material"
 import NextLink from "@/components/NextLink"
 import RenderedPageServer from "./_ui/RenderedPageServer"
 import env from "@/env"
 import dynamic from "next/dynamic"
+import ResponsiveButton from "@/components/ResponsiveButton"
 
 const RenderedPageClient = dynamic(() => import("./_ui/RenderedPageClient"))
 
@@ -20,10 +21,10 @@ export default async function WikiViewPage(props: PageProps<"/-/[[...slug]]">) {
     <>
       <HeaderMenu>
         <ButtonGroup>
-          <Button startIcon={<NoteAdd />} LinkComponent={NextLink} href={`/new/${fullSlug}`}>New</Button>
-          <Button startIcon={<Settings />} LinkComponent={NextLink} href={`/settings/${fullSlug}`}>Settings</Button>
-          <Button startIcon={<PermMedia />} LinkComponent={NextLink} href={`/assets/${fullSlug}`}>Assets</Button>
-          <Button startIcon={<EditDocument />} LinkComponent={NextLink} href={`/edit/${fullSlug}`}>Edit</Button>
+          <ResponsiveButton startIcon={<NoteAdd />} LinkComponent={NextLink} href={`/new/${fullSlug}`}>New</ResponsiveButton>
+          <ResponsiveButton startIcon={<Settings />} LinkComponent={NextLink} href={`/settings/${fullSlug}`}>Settings</ResponsiveButton>
+          <ResponsiveButton startIcon={<PermMedia />} LinkComponent={NextLink} href={`/assets/${fullSlug}`}>Assets</ResponsiveButton>
+          <ResponsiveButton startIcon={<EditDocument />} LinkComponent={NextLink} href={`/edit/${fullSlug}`}>Edit</ResponsiveButton>
         </ButtonGroup>
       </HeaderMenu>
       {env.NEXT_PUBLIC_ENABLE_CLIENT_RENDERING
