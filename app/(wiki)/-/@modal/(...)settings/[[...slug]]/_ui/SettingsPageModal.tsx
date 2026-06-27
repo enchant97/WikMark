@@ -1,6 +1,7 @@
 "use client"
 import { InlineAppErrorAlert, InlineSuccessAlert } from "@/components/InlineAlert"
 import { deletePageAction, updatePageSettingsAction } from "@/lib/actions"
+import { intoPageSlug } from "@/lib/helpers"
 import { useModalNavigation } from "@/lib/ModalNavigationContext"
 import { Alert, Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, TextField } from "@mui/material"
 import Form from "next/form"
@@ -12,6 +13,7 @@ export default function SettingsPageModal(props: { fullSlug: string, title: stri
   const { closeAndNavigate } = useModalNavigation()
   const router = useRouter()
   const [open, setOpen] = useState(true)
+  const [newFullSlug, setNewFullSlug] = useState(props.fullSlug)
   const [updateState, dispatchUpdate, updatePending] = useActionState(updatePageSettingsAction, null)
   const [deleteState, dispatchDelete, deletePending] = useActionState(deletePageAction, null)
   const globalPending = updatePending || deletePending
@@ -59,7 +61,8 @@ export default function SettingsPageModal(props: { fullSlug: string, title: stri
                   name="newFullSlug"
                   label="Path"
                   helperText="Full path for page (including page slug)"
-                  defaultValue={props.fullSlug}
+                  value={newFullSlug}
+                  onChange={(ev) => setNewFullSlug(intoPageSlug(ev.currentTarget.value))}
                   required
                   fullWidth
                 />

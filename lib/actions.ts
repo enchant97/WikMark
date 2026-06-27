@@ -13,13 +13,14 @@ export async function getPageAssets(fullSlug: string): Promise<string[]> {
 }
 
 export async function createPageAction(_prevState: unknown, formData: FormData) {
-  const parentSlug = formData.get("parentSlug")?.toString()
+  let parentSlug = formData.get("parentSlug")?.toString()
   const slug = formData.get("slug")?.toString()
   const title = formData.get("title")?.toString()
   try {
     if (parentSlug === undefined || slug === undefined || title === undefined) {
       throw new AppError("form missing required fields", AppErrorCode.Validation)
     }
+    parentSlug = parentSlug.split("/").filter(v => v !== "").join("/")
     const fullSlug = await createPage(parentSlug, slug, { title })
     return {
       success: true,
@@ -80,12 +81,13 @@ export async function updatePageContentsAction(
 
 export async function updatePageSettingsAction(_prevState: unknown, formData: FormData) {
   const currentFullSlug = formData.get("currentFullSlug")?.toString()
-  const newFullSlug = formData.get("newFullSlug")?.toString()
+  let newFullSlug = formData.get("newFullSlug")?.toString()
   const title = formData.get("title")?.toString()
   try {
     if (currentFullSlug === undefined || newFullSlug === undefined || title === undefined) {
       throw new AppError("form missing required fields", AppErrorCode.Validation)
     }
+    newFullSlug = newFullSlug.split("/").filter(v => v !== "").join("/")
     // update metadata
     const pageParts = await getPageContentParts(currentFullSlug)
     Object.assign(pageParts.metadata, { ...pageParts.metadata, title })

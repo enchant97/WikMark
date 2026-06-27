@@ -53,6 +53,14 @@ export function isValidAssetSlugFull(slug: string): boolean {
   return true
 }
 
+export function intoPageSlugPart(v: string): string {
+  return v.replaceAll(" ", "-").replaceAll(/[^a-zA-Z0-9-_]/g, "")
+}
+
+export function intoPageSlug(v: string): string {
+  return v.replaceAll(" ", "-").replaceAll(/[^a-zA-Z0-9-_/]/g, "")
+}
+
 /**
  * Transform relative raw content oaths into correct api path
  */

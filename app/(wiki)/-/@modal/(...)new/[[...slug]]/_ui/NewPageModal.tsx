@@ -1,6 +1,7 @@
 "use client"
 import { InlineAppErrorAlert } from "@/components/InlineAlert";
 import { createPageAction } from "@/lib/actions";
+import { intoPageSlug, intoPageSlugPart } from "@/lib/helpers";
 import { useModalNavigation } from "@/lib/ModalNavigationContext";
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, TextField } from "@mui/material";
 import Form from 'next/form'
@@ -12,16 +13,21 @@ export default function NewPageModal(props: { parentSlug: string }) {
   const router = useRouter()
   const [createState, dispatchCreate, createPending] = useActionState(createPageAction, null)
   const [open, setOpen] = useState(true)
+  const [pageSlug, setPageSlug] = useState("")
+  const [parentSlug, setParentSlug] = useState(props.parentSlug)
+
   useEffect(() => {
     if (createState?.success) {
       setOpen(false)
       closeAndNavigate(`/-/${createState.fullSlug}`)
     }
   }, [createState])
+
   const onClose = () => {
     setOpen(false)
     router.back()
   }
+
   return (
     <Dialog open={open} onClose={onClose}>
       <DialogTitle>Create Page</DialogTitle>
@@ -32,6 +38,7 @@ export default function NewPageModal(props: { parentSlug: string }) {
               name="title"
               label="Title"
               helperText="the title of the page (will display as h1)"
+              onChange={(ev) => setPageSlug(intoPageSlugPart(ev.currentTarget.value))}
               required
               fullWidth
             />
@@ -39,6 +46,8 @@ export default function NewPageModal(props: { parentSlug: string }) {
               name="slug"
               label="Slug"
               helperText="URL-friendly name of page"
+              value={pageSlug}
+              onChange={(ev) => setPageSlug(intoPageSlugPart(ev.currentTarget.value))}
               required
               fullWidth
             />
@@ -46,7 +55,8 @@ export default function NewPageModal(props: { parentSlug: string }) {
               name="parentSlug"
               label="Parent Slug"
               helperText="where the page will be created under (leave blank for root)"
-              defaultValue={props.parentSlug}
+              value={parentSlug}
+              onChange={(ev) => setParentSlug(intoPageSlug(ev.currentTarget.value))}
               fullWidth
             />
           </Stack>
