@@ -1,9 +1,13 @@
 "use client"
-import { Breadcrumbs, Link } from "@mui/material";
+import { Breadcrumbs, ButtonGroup, Divider, Link, Stack } from "@mui/material";
 import NextLink from "@/components/NextLink";
 import HomeIcon from '@mui/icons-material/Home';
 import { joinSlugParts } from "@/lib/helpers";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, startTransition, use, useActionState, useContext, useEffect, useState } from "react";
+import { authClient } from "@/lib/auth-client";
+import ResponsiveButton from "@/components/ResponsiveButton";
+import { Login, Logout } from "@mui/icons-material";
+import { useRouter } from "next/navigation";
 
 interface HeaderMenuContextType {
   menu: React.ReactNode | null
@@ -56,6 +60,18 @@ export function HeaderMenuProvider({
 
 export default function WikiHeader(props: { breadcrumb: string[] }) {
   const { menu } = useHeaderMenu()
+  // TODO better logout system needed (this pulls in a lot of unused data)
+  const router = useRouter()
+  const { data: authData } = authClient.useSession()
+  const [_logoutState, dispatchLogout, logoutPending] = useActionState(async () => {
+    return await authClient.signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          router.push("/")
+        }
+      },
+    })
+  }, null)
   return (
     <>
       <Breadcrumbs
@@ -88,7 +104,13 @@ export default function WikiHeader(props: { breadcrumb: string[] }) {
           )
         })}
       </Breadcrumbs>
-      {menu}
+      <Stack spacing={1} direction="row" divider={<Divider orientation="vertical" flexItem />}>
+        {menu}
+        {authData === null
+          ? <ResponsiveButton variant="outlined" startIcon={<Login />} LinkComponent={NextLink} href="/auth/sign-in">Sign-In</ResponsiveButton>
+          : <ResponsiveButton variant="outlined" startIcon={<Logout />} onClick={() => startTransition(dispatchLogout)} loading={logoutPending}>Sign-Out</ResponsiveButton>
+        }
+      </Stack>
     </>
   )
 }

@@ -6,6 +6,8 @@ const isAbsolute = (s: string) => s.startsWith("/")
 const env = createEnv({
   server: {
     WIKI_PATH: z.coerce.string().refine(isAbsolute, { error: "Expected an absolute path" }),
+    DB_PATH: z.coerce.string().refine(isAbsolute, { error: "Expected an absolute path" }),
+    AUTH_SECRET: z.base64().min(32),
   },
   client: {
     NEXT_PUBLIC_ENABLE_LANDING: z.stringbool().default(true),
@@ -23,6 +25,7 @@ const env = createEnv({
     ),
   },
   experimental__runtimeEnv: {
+    NEXT_PUBLIC_ENABLE_LANDING: process.env.NEXT_PUBLIC_ENABLE_LANDING,
     NEXT_PUBLIC_PUBLIC_URL: process.env.NEXT_PUBLIC_PUBLIC_URL,
     NEXT_PUBLIC_ENABLE_CLIENT_RENDERING: process.env.NEXT_PUBLIC_ENABLE_CLIENT_RENDERING,
   },
