@@ -1,13 +1,17 @@
 "use client"
 import { AlertLevel, InlineAlert } from "@/components/InlineAlert"
 import NextLink from "@/components/NextLink"
+import env from "@/env"
 import { authClient } from "@/lib/auth-client"
 import { Button, Stack, TextField } from "@mui/material"
 import Form from "next/form"
-import { useRouter } from "next/navigation"
+import { redirect, useRouter } from "next/navigation"
 import { useActionState } from "react"
 
 export default function SignUpPage() {
+  if (!env.NEXT_PUBLIC_ENABLE_SIGNUP) {
+    redirect("/auth/sign-in")
+  }
   const router = useRouter()
   const [signupState, dispatchSignup, signupPending] = useActionState(async (_prevData: unknown, form: FormData) => {
     return await authClient.signUp.email({

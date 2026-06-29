@@ -1,6 +1,7 @@
 "use client"
 import { AlertLevel, InlineAlert } from "@/components/InlineAlert"
 import NextLink from "@/components/NextLink"
+import env from "@/env"
 import { authClient } from "@/lib/auth-client"
 import { Button, Checkbox, FormControlLabel, Stack, TextField } from "@mui/material"
 import Form from "next/form"
@@ -31,7 +32,7 @@ export default function SignUpPage() {
           <FormControlLabel control={<Checkbox name="rememberMe" defaultChecked />} label="Remember Me" />
           {signinState?.error && !signinPending && <InlineAlert message={signinState.error.message} level={AlertLevel.Error} />}
           <Button variant="outlined" type="submit" loading={signinPending}>Sign-In</Button>
-          <Button variant="outlined" LinkComponent={NextLink} href="/auth/sign-up">Sign-Up Instead?</Button>
+          {env.NEXT_PUBLIC_ENABLE_SIGNUP && <Button variant="outlined" LinkComponent={NextLink} href="/auth/sign-up">Sign-Up Instead?</Button>}
           <Button variant="outlined" LinkComponent={NextLink} href="/">Back Home</Button>
         </Stack>
       </Form>

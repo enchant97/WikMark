@@ -12,5 +12,6 @@ export const auth = betterAuth({
   },
   emailAndPassword: {
     enabled: true,
+    disableSignUp: !env.NEXT_PUBLIC_ENABLE_SIGNUP,
   },
 })
