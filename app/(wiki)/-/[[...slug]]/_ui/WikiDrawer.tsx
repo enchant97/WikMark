@@ -1,6 +1,6 @@
 "use client"
 
-import React, { PropsWithChildren } from 'react';
+import React, { PropsWithChildren, use } from 'react';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
@@ -10,31 +10,18 @@ import MenuIcon from '@mui/icons-material/Menu';
 import Toolbar from '@mui/material/Toolbar';
 import WikiHeader from '@/components/WikiHeader';
 import WikiDrawerTree from './WikiDrawerTree';
-import { useSelectedLayoutSegments } from 'next/navigation';
-import { joinSlugParts } from '@/lib/helpers';
-import { getRelPageSlugs } from '@/lib/actions';
-import useSWR from 'swr';
 
 const drawerWidth = 240;
 
-function useSlugPartsFromLayoutSegments(): string[] {
-  const parts = (useSelectedLayoutSegments()[1] ?? "").split("/")
-  if (parts[0] == "") {
-    parts.pop()
-  }
-  return parts
+interface Props extends PropsWithChildren {
+  slugParts: string[]
+  relPageSlugs: Promise<string[]>
 }
 
-export default function WikiDrawer(props: PropsWithChildren) {
+export default function WikiDrawer(props: Props) {
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [isClosing, setIsClosing] = React.useState(false);
-  const slugParts = useSlugPartsFromLayoutSegments()
-  // TODO find a way of rendering tree on server-side
-  const { data: relPageSlugs } = useSWR(
-    ["relPageSlugs", slugParts],
-    () => getRelPageSlugs(joinSlugParts(slugParts)),
-    { fallbackData: [], suspense: true },
-  )
+  const relPageSlugs = use(props.relPageSlugs)
 
   const handleDrawerClose = () => {
     setIsClosing(true);
@@ -55,7 +42,7 @@ export default function WikiDrawer(props: PropsWithChildren) {
     <div>
       <Toolbar />
       <Divider />
-      <WikiDrawerTree relSlugs={relPageSlugs} slugParts={slugParts} />
+      <WikiDrawerTree relSlugs={relPageSlugs} slugParts={props.slugParts} />
     </div>
   );
 
@@ -78,7 +65,7 @@ export default function WikiDrawer(props: PropsWithChildren) {
           >
             <MenuIcon />
           </IconButton>
-          <WikiHeader breadcrumb={slugParts} />
+          <WikiHeader breadcrumb={props.slugParts} />
         </Toolbar>
       </AppBar>
       <Box
