@@ -4,6 +4,16 @@ import { revalidatePath } from "next/cache"
 import { createPage, deletePage, getChildrenBySlug, getPageContentParts, renamePage, writePageContentParts } from "@/lib/data/page"
 import { createAsset, deleteAsset, getPageAssetsBySlug } from "@/lib/data/asset"
 import { AppError, AppErrorCode } from "./errors"
+import { auth } from "./auth"
+import { headers } from "next/headers"
+
+async function isAuthenticated(): Promise<boolean> {
+  return (await auth.api.getSession({ headers: await headers() })) !== null
+}
+
+function throwUnauthorized(): never {
+  throw new AppError("this action requires an account", AppErrorCode.Unauthorized)
+}
 
 export async function getRelPageSlugs(parentSlug: string): Promise<string[]> {
   return await getChildrenBySlug(parentSlug)
@@ -18,6 +28,7 @@ export async function createPageAction(_prevState: unknown, formData: FormData) 
   const slug = formData.get("slug")?.toString()
   const title = formData.get("title")?.toString()
   try {
+    if (!await isAuthenticated()) { throwUnauthorized() }
     if (parentSlug === undefined || slug === undefined || title === undefined) {
       throw new AppError("form missing required fields", AppErrorCode.Validation)
     }
@@ -39,6 +50,7 @@ export async function createAssetAction(_prevState: unknown, formData: FormData)
   const parentSlug = formData.get("parentSlug")?.toString()
   const file = formData.get("file")?.valueOf()
   try {
+    if (!await isAuthenticated()) { throwUnauthorized() }
     if (parentSlug === undefined || (file === undefined || !(file instanceof File))) {
       throw new AppError("form missing required fields", AppErrorCode.Validation)
     }
@@ -65,6 +77,7 @@ export async function updatePageContentsAction(
   },
 ) {
   try {
+    if (!await isAuthenticated()) { throwUnauthorized() }
     await writePageContentParts(payload.fullSlug, {
       content: payload.content,
       metadata: payload.metadata,
@@ -85,6 +98,7 @@ export async function updatePageSettingsAction(_prevState: unknown, formData: Fo
   let newFullSlug = formData.get("newFullSlug")?.toString()
   const title = formData.get("title")?.toString()
   try {
+    if (!await isAuthenticated()) { throwUnauthorized() }
     if (currentFullSlug === undefined || newFullSlug === undefined || title === undefined) {
       throw new AppError("form missing required fields", AppErrorCode.Validation)
     }
@@ -111,6 +125,7 @@ export async function updatePageSettingsAction(_prevState: unknown, formData: Fo
 
 export async function deletePageAction(_prevState: unknown, payload: { fullSlug: string }) {
   try {
+    if (!await isAuthenticated()) { throwUnauthorized() }
     await deletePage(payload.fullSlug)
     return { success: true }
   } catch (err) {
@@ -123,6 +138,7 @@ export async function deletePageAction(_prevState: unknown, payload: { fullSlug:
 
 export async function deleteAssetAction(_prevState: unknown, payload: { fullSlug: string }) {
   try {
+    if (!await isAuthenticated()) { throwUnauthorized() }
     await deleteAsset(payload.fullSlug)
     revalidatePath("/assets")
     return {

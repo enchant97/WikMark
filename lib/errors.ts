@@ -3,6 +3,7 @@ export enum AppErrorCode {
   Validation = "VALIDATION",
   NotFound = "NOT_FOUND",
   Conflict = "CONFLICT",
+  Unauthorized = "UNAUTHORIZED",
 }
 
 export interface ErrorDTO {
