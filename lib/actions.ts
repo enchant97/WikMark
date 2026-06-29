@@ -1,7 +1,8 @@
 "use server"
 
-import { createAsset, createPage, deleteAsset, deletePage, getChildrenBySlug, getPageAssetsBySlug, getPageContentParts, renamePage, writePageContentParts } from "@/lib/data"
 import { revalidatePath } from "next/cache"
+import { createPage, deletePage, getChildrenBySlug, getPageContentParts, renamePage, writePageContentParts } from "@/lib/data/page"
+import { createAsset, deleteAsset, getPageAssetsBySlug } from "@/lib/data/asset"
 import { AppError, AppErrorCode } from "./errors"
 
 export async function getRelPageSlugs(parentSlug: string): Promise<string[]> {

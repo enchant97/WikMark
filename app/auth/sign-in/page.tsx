@@ -2,7 +2,7 @@
 import { AlertLevel, InlineAlert } from "@/components/InlineAlert"
 import NextLink from "@/components/NextLink"
 import { authClient } from "@/lib/auth-client"
-import { Button, Checkbox, Divider, FormControlLabel, Stack, TextField } from "@mui/material"
+import { Button, Checkbox, FormControlLabel, Stack, TextField } from "@mui/material"
 import Form from "next/form"
 import { useRouter } from "next/navigation"
 import { useActionState } from "react"
@@ -23,7 +23,7 @@ export default function SignUpPage() {
 
   return (
     <>
-      <h1>Sign-Up</h1>
+      <h1>Sign-In</h1>
       <Form action={dispatchSignin}>
         <Stack spacing={1} sx={{ padding: 1 }}>
           <TextField label="Email" name="email" type="email" autoComplete="username" required fullWidth />

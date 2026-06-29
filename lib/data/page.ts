@@ -1,48 +1,11 @@
 import path from "node:path";
-import env from "@/env";
 import * as fs from "node:fs/promises";
 import matter from "gray-matter";
-import { isValidAssetSlugFull, isValidAssetSlugPart, isValidPageSlugFull, isValidPageSlugPart, renderMarkdown } from "./helpers";
-import { AppError, AppErrorCode } from "./errors";
+import { isValidPageSlugFull, isValidPageSlugPart, renderMarkdown } from "@/lib/helpers";
+import { AppError, AppErrorCode } from "@/lib/errors";
+import { doesFileExist, getFullPath, isPathIndex } from "./helpers";
 
 const INDEX_PAGE_NAME = "_index"
-
-async function doesFileExist(fullPath: string): Promise<boolean> {
-  try {
-    if (!(await fs.stat(fullPath)).isFile) {
-      return false
-    }
-  } catch (err) {
-    if (err.code === "ENOENT") { return false }
-    throw err
-  }
-  return true
-}
-
-function isPathInside(child: string, parent: string): boolean {
-  const relative = path.relative(parent, child)
-  return relative !== "" && !relative.startsWith("..") && !path.isAbsolute(relative)
-}
-
-function isPathIndex(fullPath: string): boolean {
-  return fullPath === env.WIKI_PATH
-}
-
-/**
- * Get the absolute system path for given slug.
- *
- * - Assumes slug has been validated
- * - Will prevent path traversal outside of `WIKI_PATH`
- * - Must NOT be passed to client
- */
-function getFullPath(currentSlug: string): string {
-  const fullPath = path.join(env.WIKI_PATH, path.normalize(currentSlug))
-  if (fullPath !== env.WIKI_PATH && !isPathInside(fullPath, env.WIKI_PATH)) {
-    console.warn(`path traversal attempt at: '${fullPath}'`)
-    throw new AppError(`invalid slug given: '${currentSlug}'`, AppErrorCode.Validation)
-  }
-  return fullPath
-}
 
 /**
  * Get the child page slugs (relative to parent) for given parent slug.
@@ -91,42 +54,6 @@ export async function getChildrenBySlug(currentSlug: string): Promise<string[]> 
 }
 
 /**
- * Get asset slugs (relative to parent) for given page slug.
- *
- * - Expects a full page slug
- * - Performs slug validation
- */
-export async function* getPageAssetsBySlug(currentSlug: string): AsyncIterableIterator<string> {
-  if (!isValidPageSlugFull(currentSlug, { allowIndex: true })) {
-    throw new AppError(`invalid slug given: '${currentSlug}'`, AppErrorCode.Validation)
-  }
-  const fullPath = getFullPath(currentSlug)
-  try {
-    const results = fs.glob("*", {
-      cwd: fullPath,
-      exclude: ["*.md"],
-      withFileTypes: true
-    })
-    for await (const entry of results) {
-      if (entry.isFile() && isValidAssetSlugPart(entry.name)) {
-        yield entry.name
-      }
-    }
-  } catch (err) {
-    if (err.code === "ENOENT") {
-      if (isPathIndex(fullPath) || await doesFileExist(`${fullPath}.md`)) {
-        return
-      }
-      throw new AppError(
-        `given page slug does not exist: '${currentSlug}'`,
-        AppErrorCode.NotFound,
-        { cause: err })
-    }
-    throw err
-  }
-}
-
-/**
  * Create a new page under given parent slug.
  *
  * - Parent slug will be created if does not exist
@@ -160,34 +87,6 @@ export async function createPage(parentSlug: string, slug: string, metadata: obj
     }
   }
   return fullSlug
-}
-
-/**
- * Create a new asset under given parent page slug.
- *
- * - Parent slug will be created if does not exist
- * - Performs slug validation
- */
-export async function createAsset(parentSlug: string, slug: string, rawContent: Blob) {
-  if (!isValidPageSlugFull(parentSlug, { allowIndex: true })) {
-    throw new AppError(`invalid slug given: '${parentSlug}'`, AppErrorCode.Validation)
-  } else if (!isValidAssetSlugPart(slug)) {
-    throw new AppError(`invalid slug given: '${slug}'`, AppErrorCode.Validation)
-  }
-  const parentFullPath = getFullPath(parentSlug)
-  const fullPath = `${parentFullPath}/${slug}`
-  await fs.mkdir(parentFullPath, { recursive: true })
-  try {
-    await fs.writeFile(fullPath, await rawContent.bytes(), { flag: "wx" })
-  }
-  catch (err) {
-    if (err.code === "EEXIST") {
-      throw new AppError(
-        `asset already exists with that slug: ${slug}`,
-        AppErrorCode.Conflict,
-        { cause: err })
-    }
-  }
 }
 
 /**
@@ -338,46 +237,4 @@ export async function deletePage(fullSlug: string) {
     fs.rm(`${fullPath}.md`, { force: true }),
     fs.rm(fullPath, { recursive: true, force: true }),
   ])
-}
-
-/**
- * Delete an asset.
- *
- * - Prevents page deletion
- * - Performs slug validation
- */
-export async function deleteAsset(fullSlug: string) {
-  if (!isValidAssetSlugFull(fullSlug)) {
-    throw new AppError(`invalid slug given: '${fullSlug}'`, AppErrorCode.Validation)
-  }
-  const fullPath = getFullPath(fullSlug)
-  if (path.extname(fullPath) === ".md") {
-    throw new AppError(`cannot delete pages: ${fullSlug}`, AppErrorCode.Validation)
-  }
-  await fs.rm(fullPath, { force: true })
-}
-
-/**
- * Read raw file content from given slug.
- *
- * - Expects a slug with extension
- * - Can return raw markdown by using `.md`
- * - Performs slug validation
- */
-export async function getRawContent(fullSlug: string) {
-  if (!isValidAssetSlugFull(fullSlug)) {
-    throw new AppError(`invalid slug given: '${fullSlug}'`, AppErrorCode.Validation)
-  }
-  const fullPath = getFullPath(fullSlug)
-  try {
-    return await fs.readFile(fullPath)
-  } catch (err) {
-    if (err.code === "ENOENT") {
-      throw new AppError(
-        `given asset slug does not exist: '${fullSlug}'`,
-        AppErrorCode.NotFound,
-        { cause: err })
-    }
-    throw err
-  }
 }

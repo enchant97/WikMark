@@ -1,4 +1,4 @@
-import { getPageContentParts } from "@/lib/data"
+import { getPageContentParts } from "@/lib/data/page"
 import { joinSlugParts } from "@/lib/helpers"
 import WikiEditor from "./_ui/WikiEditor"
 

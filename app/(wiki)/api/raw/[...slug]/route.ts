@@ -1,6 +1,6 @@
 import type { NextRequest } from 'next/server'
 import { joinSlugParts } from "@/lib/helpers"
-import { getRawContent } from '@/lib/data'
+import { getRawContent } from '@/lib/data/asset'
 import { AppError, AppErrorCode } from '@/lib/errors'
 import { notFound } from 'next/navigation'
 
