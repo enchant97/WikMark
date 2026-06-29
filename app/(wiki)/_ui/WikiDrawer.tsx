@@ -3,7 +3,6 @@
 import React, { PropsWithChildren } from 'react';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
-import CssBaseline from '@mui/material/CssBaseline';
 import Divider from '@mui/material/Divider';
 import Drawer from '@mui/material/Drawer';
 import IconButton from '@mui/material/IconButton';
@@ -62,7 +61,6 @@ export default function WikiDrawer(props: PropsWithChildren) {
 
   return (
     <Box sx={{ display: 'flex' }}>
-      <CssBaseline />
       <AppBar
         position="fixed"
         sx={{
