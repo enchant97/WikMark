@@ -1,18 +1,10 @@
-import React from "react";
-import { HeaderMenuProvider } from "./_ui/WikiHeader";
-import { Container } from "@mui/material";
-import WikiDrawer from "./_ui/WikiDrawer";
+import { PropsWithChildren } from "react";
+import { HeaderMenuProvider } from "@/components/WikiHeader";
 
-export default async function WikiLayout(props: {
-  children: React.ReactNode,
-}) {
+export default function WikiLayout(props: PropsWithChildren) {
   return (
     <HeaderMenuProvider>
-      <WikiDrawer>
-        <Container>
-          {props.children}
-        </Container>
-      </WikiDrawer>
+      {props.children}
     </HeaderMenuProvider>
   )
 }

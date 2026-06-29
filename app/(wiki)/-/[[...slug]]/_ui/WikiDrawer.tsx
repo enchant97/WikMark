@@ -8,7 +8,7 @@ import Drawer from '@mui/material/Drawer';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import Toolbar from '@mui/material/Toolbar';
-import WikiHeader from './WikiHeader';
+import WikiHeader from '@/components/WikiHeader';
 import WikiDrawerTree from './WikiDrawerTree';
 import { useSelectedLayoutSegments } from 'next/navigation';
 import { joinSlugParts } from '@/lib/helpers';

@@ -4,7 +4,7 @@ import { startTransition, useActionState, useState } from "react";
 import { updatePageContentsAction } from "@/lib/actions";
 import { ButtonGroup } from "@mui/material"
 import NextLink from "@/components/NextLink"
-import { HeaderMenu } from "@/app/(wiki)/_ui/WikiHeader";
+import { HeaderMenu } from "@/components/WikiHeader";
 import { Cancel, Save } from "@mui/icons-material";
 import { InlineAppErrorAlert } from "@/components/InlineAlert";
 import ResponsiveButton from "@/components/ResponsiveButton";

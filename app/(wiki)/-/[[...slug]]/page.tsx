@@ -1,6 +1,6 @@
 import { getPageContentParts } from "@/lib/data/page"
 import { joinSlugParts } from "@/lib/helpers"
-import { HeaderMenu } from "../../_ui/WikiHeader"
+import { HeaderMenu } from "@/components/WikiHeader"
 import { ButtonGroup } from "@mui/material"
 import { EditDocument, NoteAdd, PermMedia, Settings } from "@mui/icons-material"
 import NextLink from "@/components/NextLink"

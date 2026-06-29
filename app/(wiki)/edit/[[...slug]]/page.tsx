@@ -2,7 +2,6 @@ import { getPageContentParts } from "@/lib/data/page"
 import { joinSlugParts } from "@/lib/helpers"
 import WikiEditor from "./_ui/WikiEditor"
 
-
 export default async function WikiEditPage(props: PageProps<"/edit/[[...slug]]">) {
   const { slug } = await props.params
   const fullSlug = joinSlugParts(slug)
