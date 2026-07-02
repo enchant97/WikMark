@@ -174,3 +174,7 @@ export async function deleteAssetAction(_prevState: unknown, payload: { fullSlug
     throw err
   }
 }
+
+export async function getSearchResultsAction(_prevState: unknown, payload: { query: string }) {
+  return searchDb.getSearchResults(payload.query, 12)
+}

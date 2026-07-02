@@ -29,6 +29,28 @@ function escapeLike(s: string) {
   return s.replace(/[\\%_]/g, (c) => '\\' + c)
 }
 
+
+export interface SearchResult {
+  slug: string
+  title: string
+  excerpt: string
+  rank: number
+}
+
+export function getSearchResults(query: string, limit: number) {
+  const ftsQuery = query.split(/\s+/).map(v => `${v.replace(/"/g, '')}*`).join(' AND ');
+  const rows = getDb().prepare(`
+    SELECT slug, title,
+           snippet(pages_fts, 2, '<mark>', '</mark>', '…', 12) AS excerpt,
+           rank
+    FROM pages_fts
+    WHERE pages_fts MATCH ?
+    ORDER BY rank
+    LIMIT ?
+  `).all(ftsQuery, limit);
+  return rows as SearchResult[]
+}
+
 export function deleteIndexedPage(slug: string, options: { children: boolean } = { children: true }) {
   const db = getDb()
   if (options.children) {
