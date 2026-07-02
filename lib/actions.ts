@@ -6,6 +6,9 @@ import { createAsset, deleteAsset, getPageAssetsBySlug } from "@/lib/data/asset"
 import { AppError, AppErrorCode } from "./errors"
 import { auth } from "./auth"
 import { headers } from "next/headers"
+import { after } from "next/server"
+import * as indexer from "@/lib/search/indexer"
+import * as searchDb from "@/lib/search/db"
 
 async function isAuthenticated(): Promise<boolean> {
   return (await auth.api.getSession({ headers: await headers() })) !== null
@@ -34,6 +37,10 @@ export async function createPageAction(_prevState: unknown, formData: FormData) 
     }
     parentSlug = parentSlug.split("/").filter(v => v !== "").join("/")
     const fullSlug = await createPage(parentSlug, slug, { title })
+    after(() => {
+      const indexedPage = indexer.indexPageFromNew(fullSlug, { title })
+      searchDb.updateIndexedPage(indexedPage)
+    })
     return {
       success: true,
       fullSlug,
@@ -78,9 +85,14 @@ export async function updatePageContentsAction(
 ) {
   try {
     if (!await isAuthenticated()) { throwUnauthorized() }
-    await writePageContentParts(payload.fullSlug, {
+    const pageContentParts = {
       content: payload.content,
       metadata: payload.metadata,
+    }
+    await writePageContentParts(payload.fullSlug, pageContentParts)
+    after(async () => {
+      const indexedPage = await indexer.indexPageFromParts(payload.fullSlug, pageContentParts)
+      searchDb.updateIndexedPage(indexedPage)
     })
     return {
       success: true,
@@ -107,10 +119,17 @@ export async function updatePageSettingsAction(_prevState: unknown, formData: Fo
     const pageParts = await getPageContentParts(currentFullSlug)
     Object.assign(pageParts.metadata, { ...pageParts.metadata, title })
     await writePageContentParts(currentFullSlug, pageParts)
+    const isRenaming = currentFullSlug !== newFullSlug
     // perform rename if required
-    if (currentFullSlug !== newFullSlug) {
+    if (isRenaming) {
       await renamePage(currentFullSlug, newFullSlug)
     }
+    after(() => {
+      if (isRenaming) {
+        searchDb.renameIndexedPage(currentFullSlug, newFullSlug)
+      }
+      searchDb.updateIndexedPageMetadata(newFullSlug, pageParts.metadata)
+    })
     return {
       success: true,
       newFullSlug,
@@ -127,6 +146,9 @@ export async function deletePageAction(_prevState: unknown, payload: { fullSlug:
   try {
     if (!await isAuthenticated()) { throwUnauthorized() }
     await deletePage(payload.fullSlug)
+    after(() => {
+      searchDb.deleteIndexedPage(payload.fullSlug)
+    })
     return { success: true }
   } catch (err) {
     if (err instanceof AppError) {

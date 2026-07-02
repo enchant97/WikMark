@@ -7,6 +7,7 @@ const env = createEnv({
   server: {
     WIKI_PATH: z.coerce.string().refine(isAbsolute, { error: "Expected an absolute path" }),
     DB_PATH: z.coerce.string().refine(isAbsolute, { error: "Expected an absolute path" }),
+    SEARCH_DB_PATH: z.coerce.string().refine(isAbsolute, { error: "Expected an absolute path" }),
     AUTH_SECRET: z.base64().min(32),
   },
   client: {

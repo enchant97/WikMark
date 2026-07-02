@@ -10,5 +10,8 @@ export async function register() {
     const { getMigrations } = await import("better-auth/db/migration")
     const { runMigrations } = await getMigrations(auth.options);
     await runMigrations();
+    // setup search index
+    const searchDb = await import("@/lib/search/db")
+    searchDb.rebuildIndex()
   }
 }

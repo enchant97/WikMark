@@ -7,6 +7,7 @@ import remarkRehype from "remark-rehype"
 import { unified } from "unified"
 import env from "@/env"
 import remarkUrlTransformer from "./remarkUrlTransformer"
+import remarkIndexable from "./remarkIndexable"
 
 export function joinSlugParts(parts?: string[]): string {
   return (parts ?? []).join("/")
@@ -82,5 +83,14 @@ export async function renderMarkdown(md: string | Buffer<ArrayBuffer>) {
     .use(remarkRehype)
     .use(rehypeSanitize)
     .use(rehypeStringify)
+    .process(md))
+}
+
+export async function renderToIndexable(md: string | Buffer<ArrayBuffer>) {
+  return String(await unified()
+    .use(remarkParse)
+    .use(remarkFrontmatter)
+    .use(remarkGfm)
+    .use(remarkIndexable)
     .process(md))
 }
