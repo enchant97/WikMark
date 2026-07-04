@@ -9,6 +9,7 @@ import { headers } from "next/headers"
 import { after } from "next/server"
 import * as indexer from "@/lib/search/indexer"
 import * as searchDb from "@/lib/search/db"
+import { parsePageMetadata } from "@/lib/types"
 
 async function isAuthenticated(): Promise<boolean> {
   return (await auth.api.getSession({ headers: await headers() })) !== null
@@ -87,7 +88,7 @@ export async function updatePageContentsAction(
     if (!await isAuthenticated()) { throwUnauthorized() }
     const pageContentParts = {
       content: payload.content,
-      metadata: payload.metadata,
+      metadata: parsePageMetadata(payload.metadata),
     }
     await writePageContentParts(payload.fullSlug, pageContentParts)
     after(async () => {

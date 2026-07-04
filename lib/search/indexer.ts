@@ -4,6 +4,7 @@ import path from "node:path";
 import { isValidPageSlugPart, renderToIndexable } from "@/lib/helpers";
 import matter from "gray-matter";
 import { PageContentParts } from "@/lib/data/page";
+import { PageMetadata, parsePageMetadata } from "@/lib/types";
 
 export interface IndexedPage {
   slug: string
@@ -36,7 +37,7 @@ export async function indexPageFromParts(slug: string, parts: PageContentParts):
   }
 }
 
-export function indexPageFromNew(slug: string, metadata: object): IndexedPage {
+export function indexPageFromNew(slug: string, metadata: PageMetadata): IndexedPage {
   return {
     slug,
     title: metadata?.title ?? "",
@@ -46,6 +47,7 @@ export function indexPageFromNew(slug: string, metadata: object): IndexedPage {
 
 export async function indexPagePath(pagePath: string): Promise<IndexedPage> {
   const rawContent = await fs.readFile(pagePath)
-  const { content, data: metadata } = matter(rawContent)
+  const { content, data } = matter(rawContent)
+  const metadata = parsePageMetadata(data)
   return await indexPageFromParts(pathToSlug(pagePath), { content, metadata })
 }

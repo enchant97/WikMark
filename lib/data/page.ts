@@ -4,6 +4,7 @@ import matter from "gray-matter";
 import { isValidPageSlugFull, isValidPageSlugPart, renderMarkdown } from "@/lib/helpers";
 import { AppError, AppErrorCode } from "@/lib/errors";
 import { doesFileExist, getFullPath, isPathIndex } from "./helpers";
+import { PageMetadata, parsePageMetadata } from "../types";
 
 const INDEX_PAGE_NAME = "_index"
 
@@ -59,7 +60,7 @@ export async function getChildrenBySlug(currentSlug: string): Promise<string[]> 
  * - Parent slug will be created if does not exist
  * - Performs slug validation
  */
-export async function createPage(parentSlug: string, slug: string, metadata: object) {
+export async function createPage(parentSlug: string, slug: string, metadata: PageMetadata) {
   if (!isValidPageSlugFull(parentSlug, { allowIndex: true })) {
     throw new AppError(`invalid slug given: '${parentSlug}'`, AppErrorCode.Validation)
   } else if (!isValidPageSlugPart(slug)) {
@@ -152,20 +153,29 @@ export async function writePageContentRaw(fullSlug: string, rawContent: string) 
 
 export interface PageContentParts {
   content: string
-  metadata: object
+  metadata: PageMetadata
 }
 
 /**
  * Get the page content, split into content and metadata.
  *
  * - internally calls `getPageContentRaw()`
+ * - validates page metadata
  */
 export async function getPageContentParts(fullSlug: string): Promise<PageContentParts> {
   const contentRaw = await getPageContentRaw(fullSlug)
-  const out = matter(contentRaw)
-  return {
-    content: out.content,
-    metadata: out.data,
+  const { content, data } = matter(contentRaw)
+  try {
+    const metadata = parsePageMetadata(data)
+    return {
+      content,
+      metadata,
+    }
+  } catch (err) {
+    throw new AppError(
+      "failed to validate page metadata",
+      AppErrorCode.Validation,
+      { cause: err })
   }
 }
 

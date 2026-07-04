@@ -1,6 +1,7 @@
 import Database from "better-sqlite3"
 import env from "@/env"
 import { discoverPagePaths, IndexedPage, indexPagePath } from "./indexer"
+import { PageMetadata } from "@/lib/types"
 
 let db: Database.Database | null = null
 
@@ -93,7 +94,7 @@ export function updateIndexedPage(indexedPage: IndexedPage) {
   tx()
 }
 
-export function updateIndexedPageMetadata(slug: string, metadata: object) {
+export function updateIndexedPageMetadata(slug: string, metadata: PageMetadata) {
   const db = getDb()
   const stmt = db.prepare(
     "UPDATE pages_fts SET title = @title WHERE slug = @slug"

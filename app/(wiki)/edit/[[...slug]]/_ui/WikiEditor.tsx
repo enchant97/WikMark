@@ -8,13 +8,14 @@ import { HeaderMenu } from "@/components/WikiHeader";
 import { Cancel, Save } from "@mui/icons-material";
 import { InlineAppErrorAlert } from "@/components/InlineAlert";
 import ResponsiveButton from "@/components/ResponsiveButton";
+import { PageMetadata } from "@/lib/types";
 
 const Editor = dynamic(() => import("@/components/Editor"), { ssr: false })
 
 export default function WikiEditor(props: {
   fullSlug: string,
   initialContent: string,
-  metadata: object,
+  metadata: PageMetadata,
 }) {
   const [draftContent, setDraftContent] = useState(props.initialContent)
   const [savedContent, setSavedContent] = useState(props.initialContent)
