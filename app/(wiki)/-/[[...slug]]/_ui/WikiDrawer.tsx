@@ -13,6 +13,7 @@ import WikiDrawerTree from './WikiDrawerTree';
 import { Search } from '@mui/icons-material';
 import { Stack, TextField } from '@mui/material';
 import Form from 'next/form';
+import SearchButton from './DrawerSearchButton';
 
 const drawerWidth = 240;
 
@@ -47,7 +48,7 @@ export default function WikiDrawer(props: Props) {
         <Form action={"/search"}>
           <Stack direction="row" spacing={1}>
             <TextField size="small" label="Search" name="q" fullWidth />
-            <IconButton size="small" type="submit"><Search /></IconButton>
+            <SearchButton />
           </Stack>
         </Form>
       </Toolbar>
