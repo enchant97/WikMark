@@ -9,7 +9,7 @@ import { headers } from "next/headers"
 import { after } from "next/server"
 import * as indexer from "@/lib/search/indexer"
 import * as searchDb from "@/lib/search/db"
-import { parsePageMetadata } from "@/lib/types"
+import { MaybePageMetadata, PageMetadata, parsePageMetadata } from "@/lib/types"
 
 async function isAuthenticated(): Promise<boolean> {
   return (await auth.api.getSession({ headers: await headers() })) !== null
@@ -37,9 +37,15 @@ export async function createPageAction(_prevState: unknown, formData: FormData) 
       throw new AppError("form missing required fields", AppErrorCode.Validation)
     }
     parentSlug = parentSlug.split("/").filter(v => v !== "").join("/")
-    const fullSlug = await createPage(parentSlug, slug, { title })
+    const createdAt = (new Date()).toISOString()
+    const metadata: PageMetadata = {
+      title,
+      createdAt,
+      updatedAt: createdAt,
+    }
+    const fullSlug = await createPage(parentSlug, slug, metadata)
     after(() => {
-      const indexedPage = indexer.indexPageFromNew(fullSlug, { title })
+      const indexedPage = indexer.indexPageFromNew(fullSlug, metadata)
       searchDb.updateIndexedPage(indexedPage)
     })
     return {
@@ -81,14 +87,17 @@ export async function updatePageContentsAction(
   payload: {
     fullSlug: string,
     content: string,
-    metadata: object,
+    metadata: MaybePageMetadata,
   },
 ) {
   try {
     if (!await isAuthenticated()) { throwUnauthorized() }
     const pageContentParts = {
       content: payload.content,
-      metadata: parsePageMetadata(payload.metadata),
+      metadata: {
+        ...parsePageMetadata(payload.metadata),
+        updatedAt: (new Date()).toISOString(),
+      },
     }
     await writePageContentParts(payload.fullSlug, pageContentParts)
     after(async () => {
@@ -118,7 +127,11 @@ export async function updatePageSettingsAction(_prevState: unknown, formData: Fo
     newFullSlug = newFullSlug.split("/").filter(v => v !== "").join("/")
     // update metadata
     const pageParts = await getPageContentParts(currentFullSlug)
-    Object.assign(pageParts.metadata, { ...pageParts.metadata, title })
+    Object.assign(pageParts.metadata, {
+      ...pageParts.metadata,
+      title,
+      updatedAt: (new Date()).toISOString(),
+    })
     await writePageContentParts(currentFullSlug, pageParts)
     const isRenaming = currentFullSlug !== newFullSlug
     // perform rename if required

@@ -33,8 +33,8 @@ export default async function WikiViewPage(props: PageProps<"/-/[[...slug]]">) {
         )}
       </HeaderMenu>
       {env.NEXT_PUBLIC_ENABLE_CLIENT_RENDERING
-        ? <RenderedPageClient content={pageContentParts.content} title={pageTitle} />
-        : <RenderedPageServer content={pageContentParts.content} title={pageTitle} />
+        ? <RenderedPageClient content={pageContentParts.content} title={pageTitle} metadata={pageContentParts.metadata} />
+        : <RenderedPageServer content={pageContentParts.content} title={pageTitle} metadata={pageContentParts.metadata} />
       }
     </>
   )

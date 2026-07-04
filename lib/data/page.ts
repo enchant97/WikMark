@@ -95,7 +95,7 @@ export async function createPage(parentSlug: string, slug: string, metadata: Pag
  *
  * - Performs slug validation
  */
-export async function getPageContentRaw(fullSlug: string) {
+async function getPageContentRaw(fullSlug: string) {
   if (!isValidPageSlugFull(fullSlug, { allowIndex: true })) {
     throw new AppError(`invalid slug given: '${fullSlug}'`, AppErrorCode.Validation)
   }
@@ -140,7 +140,7 @@ export async function getPageContentRaw(fullSlug: string) {
  * - Will error if parent does not exist
  * - Performs slug validation
  */
-export async function writePageContentRaw(fullSlug: string, rawContent: string) {
+async function writePageContentRaw(fullSlug: string, rawContent: string) {
   if (!isValidPageSlugFull(fullSlug, { allowIndex: true })) {
     throw new AppError(`invalid slug given: '${fullSlug}'`, AppErrorCode.Validation)
   }
