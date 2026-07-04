@@ -5,9 +5,13 @@ import { getSearchResultsAction } from "@/lib/actions";
 import { CircularProgress, Grid, List, ListItem, ListItemButton, Stack, TextField, Typography } from "@mui/material";
 import { startTransition, useActionState, useEffect, useRef, useState } from "react";
 
+interface Props {
+  initialQuery: string
+}
+
 // TODO don't show prev query results when pending
-export default function SearchBox() {
-  const [query, setQuery] = useState("")
+export default function SearchBox({ initialQuery }: Props) {
+  const [query, setQuery] = useState(initialQuery)
   const cooldownTimer = useRef<number | undefined>();
   const [results, dispatchSearch, isSearchPending] = useActionState(getSearchResultsAction, null)
 

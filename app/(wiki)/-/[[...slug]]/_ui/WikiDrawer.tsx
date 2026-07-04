@@ -10,6 +10,9 @@ import MenuIcon from '@mui/icons-material/Menu';
 import Toolbar from '@mui/material/Toolbar';
 import WikiHeader from '@/components/WikiHeader';
 import WikiDrawerTree from './WikiDrawerTree';
+import { Search } from '@mui/icons-material';
+import { Stack, TextField } from '@mui/material';
+import Form from 'next/form';
 
 const drawerWidth = 240;
 
@@ -40,7 +43,14 @@ export default function WikiDrawer(props: Props) {
 
   const drawer = (
     <div>
-      <Toolbar />
+      <Toolbar>
+        <Form action={"/search"}>
+          <Stack direction="row" spacing={1}>
+            <TextField size="small" label="Search" name="q" fullWidth />
+            <IconButton size="small" type="submit"><Search /></IconButton>
+          </Stack>
+        </Form>
+      </Toolbar>
       <Divider />
       <WikiDrawerTree relSlugs={relPageSlugs} slugParts={props.slugParts} />
     </div>
