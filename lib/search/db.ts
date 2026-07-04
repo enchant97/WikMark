@@ -38,7 +38,7 @@ export interface SearchResult {
 }
 
 export function getSearchResults(query: string, limit: number) {
-  const ftsQuery = query.split(/\s+/).map(v => `${v.replace(/"/g, '')}*`).join(' AND ');
+  const ftsQuery = query.split(/\s+/).map(v => `"${v.replace(/"/g, ' ')}"*`).join(' AND ');
   const rows = getDb().prepare(`
     SELECT slug, title,
            snippet(pages_fts, 2, '<mark>', '</mark>', '…', 12) AS excerpt,
