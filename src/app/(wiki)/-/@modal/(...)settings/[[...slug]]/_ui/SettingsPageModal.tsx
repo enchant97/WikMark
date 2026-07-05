@@ -22,8 +22,11 @@ export default function SettingsPageModal(props: { fullSlug: string, title: stri
     if (deleteState?.success) {
       setOpen(false)
       closeAndNavigate(`/-/${props.fullSlug.split("/").slice(0, -1).join("/")}`)
+    } else if (updateState?.success && props.fullSlug !== newFullSlug) {
+      setOpen(false)
+      closeAndNavigate(`/-/${newFullSlug}`)
     }
-  }, [deleteState])
+  }, [deleteState, updateState])
   const onClose = () => {
     setOpen(false)
     router.back()

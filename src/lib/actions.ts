@@ -137,6 +137,9 @@ export async function updatePageSettingsAction(_prevState: unknown, formData: Fo
     // perform rename if required
     if (isRenaming) {
       await renamePage(currentFullSlug, newFullSlug)
+    } else {
+      // update current page
+      revalidatePath(`/-/${currentFullSlug}`)
     }
     after(() => {
       if (isRenaming) {
