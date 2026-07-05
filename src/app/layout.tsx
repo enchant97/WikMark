@@ -15,7 +15,7 @@ const roboto = Roboto({
 });
 
 export const metadata: Metadata = {
-  title: "Wiki",
+  title: "WikMark",
   description: "A wiki",
 };
 

@@ -6,9 +6,9 @@ export const auth = betterAuth({
   database: new Database(env.DB_PATH),
   secret: env.AUTH_SECRET,
   baseURL: env.NEXT_PUBLIC_PUBLIC_URL,
-  appName: "WIKI",
+  appName: "WikMark",
   advanced: {
-    cookiePrefix: "wiki",
+    cookiePrefix: "WikMark",
   },
   emailAndPassword: {
     enabled: true,

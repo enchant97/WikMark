@@ -17,7 +17,7 @@ export default function PageFooter(props: { metadata: PageMetadata }) {
           </Typography>
           <Typography variant="body2">
             <span>Powered By: </span>
-            <Link href="#">WIKI</Link>
+            <Link href="https://github.com/enchant97/WikMark" target="_blank">WikMark</Link>
           </Typography>
         </Stack>
       </Stack>
