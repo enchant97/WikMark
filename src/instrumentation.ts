@@ -12,6 +12,7 @@ export async function register() {
     await runMigrations();
     // setup search index
     const searchDb = await import("@/lib/search/db")
-    searchDb.rebuildIndex()
+    await searchDb.rebuildIndex()
+    console.log("done startup")
   }
 }
