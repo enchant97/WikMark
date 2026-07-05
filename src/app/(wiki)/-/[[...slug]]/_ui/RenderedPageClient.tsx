@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { renderMarkdown } from "@/lib/helpers"
 import { useEffect, useState } from "react"
 import RenderedPageLoading from "./RenderedPageLoading"

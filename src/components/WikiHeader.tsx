@@ -1,13 +1,17 @@
-"use client"
-import { Breadcrumbs, Divider, Link, Stack } from "@mui/material";
+"use client";
 import NextLink from "@/components/NextLink";
 import HomeIcon from '@mui/icons-material/Home';
+import Logout from "@mui/icons-material/Logout";
+import Login from "@mui/icons-material/Login";
 import { joinSlugParts } from "@/lib/helpers";
 import { createContext, startTransition, useActionState, useContext, useEffect, useState } from "react";
 import { authClient } from "@/lib/auth-client";
 import ResponsiveButton from "@/components/ResponsiveButton";
-import { Login, Logout } from "@mui/icons-material";
 import { useRouter } from "next/navigation";
+import Breadcrumbs from '@mui/material/Breadcrumbs';
+import Divider from '@mui/material/Divider';
+import Link from '@mui/material/Link';
+import Stack from '@mui/material/Stack';
 
 interface HeaderMenuContextType {
   menu: React.ReactNode | null

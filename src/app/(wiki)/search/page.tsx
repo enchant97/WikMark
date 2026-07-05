@@ -1,9 +1,10 @@
 import { getSearchResults } from "@/lib/actions"
 import { Suspense } from "react"
-import { CircularProgress, Grid } from "@mui/material"
 import SearchBox from "./_ui/SearchBox"
 import SearchResults from "./_ui/SearchResults"
 import { processRawQuery } from "./_lib"
+import CircularProgress from '@mui/material/CircularProgress';
+import Grid from '@mui/material/Grid';
 
 export default async function WikiSearchPage(props: PageProps<"/search">) {
   const { q } = await props.searchParams

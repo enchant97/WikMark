@@ -1,12 +1,19 @@
-"use client"
+"use client";
 import { InlineAppErrorAlert, InlineSuccessAlert } from "@/components/InlineAlert"
 import { deletePageAction, updatePageSettingsAction } from "@/lib/actions"
 import { intoPageSlug } from "@/lib/helpers"
 import { useModalNavigation } from "@/lib/ModalNavigationContext"
-import { Alert, Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, TextField } from "@mui/material"
 import Form from "next/form"
 import { useRouter } from "next/navigation"
 import { startTransition, useActionState, useEffect, useState } from "react"
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import Alert from '@mui/material/Alert';
+import Stack from '@mui/material/Stack';
+import TextField from '@mui/material/TextField';
 
 export default function SettingsPageModal(props: { fullSlug: string, title: string }) {
   const isHomePath = props.fullSlug === ""

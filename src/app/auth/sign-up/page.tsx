@@ -1,12 +1,14 @@
-"use client"
+"use client";
 import { AlertLevel, InlineAlert } from "@/components/InlineAlert"
 import NextLink from "@/components/NextLink"
 import env from "@/env"
 import { authClient } from "@/lib/auth-client"
-import { Button, Stack, TextField } from "@mui/material"
 import Form from "next/form"
 import { redirect, useRouter } from "next/navigation"
 import { useActionState } from "react"
+import Button from '@mui/material/Button';
+import Stack from '@mui/material/Stack';
+import TextField from '@mui/material/TextField';
 
 export default function SignUpPage() {
   if (!env.NEXT_PUBLIC_ENABLE_SIGNUP) {

@@ -1,6 +1,7 @@
-import { Stack, TextField } from "@mui/material";
 import Form from "next/form";
 import SearchButton from "./SearchButton";
+import Stack from '@mui/material/Stack';
+import TextField from '@mui/material/TextField';
 
 export default function SearchBox({ initialQuery }: {
   initialQuery: string

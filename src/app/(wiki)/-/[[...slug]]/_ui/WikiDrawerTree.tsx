@@ -1,6 +1,8 @@
 import NextLink from "@/components/NextLink";
 import { joinSlugParts } from "@/lib/helpers";
-import { List, ListItem, ListItemButton } from "@mui/material";
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemButton from '@mui/material/ListItemButton';
 
 interface Props {
   relSlugs: string[]

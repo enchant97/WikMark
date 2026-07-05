@@ -1,7 +1,11 @@
 import NextLink from "@/components/NextLink";
 import { SearchResult } from "@/lib/search/db";
-import { List, ListItem, ListItemButton, Stack, Typography } from "@mui/material";
 import { use } from "react";
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemButton from '@mui/material/ListItemButton';
+import Stack from '@mui/material/Stack';
+import Typography from '@mui/material/Typography';
 
 export default function SearchResults(props: {
   searchResultsAction: Promise<SearchResult[] | null>

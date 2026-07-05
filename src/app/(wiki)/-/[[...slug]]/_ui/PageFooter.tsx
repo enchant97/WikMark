@@ -1,5 +1,9 @@
 import { PageMetadata } from "@/lib/types";
-import { Box, Divider, Link, Stack, Typography } from "@mui/material";
+import Box from '@mui/material/Box';
+import Divider from '@mui/material/Divider';
+import Link from '@mui/material/Link';
+import Stack from '@mui/material/Stack';
+import Typography from '@mui/material/Typography';
 
 export default function PageFooter(props: { metadata: PageMetadata }) {
   return (

@@ -1,4 +1,5 @@
-import { Skeleton, Typography } from "@mui/material"
+import Skeleton from '@mui/material/Skeleton';
+import Typography from '@mui/material/Typography';
 
 export default function RenderedPageLoading() {
   return (

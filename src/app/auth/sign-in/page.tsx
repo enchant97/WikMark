@@ -1,12 +1,16 @@
-"use client"
+"use client";
 import { AlertLevel, InlineAlert } from "@/components/InlineAlert"
 import NextLink from "@/components/NextLink"
 import env from "@/env"
 import { authClient } from "@/lib/auth-client"
-import { Button, Checkbox, FormControlLabel, Stack, TextField } from "@mui/material"
 import Form from "next/form"
 import { useRouter } from "next/navigation"
 import { useActionState } from "react"
+import Button from '@mui/material/Button';
+import Stack from '@mui/material/Stack';
+import TextField from '@mui/material/TextField';
+import Checkbox from '@mui/material/Checkbox';
+import FormControlLabel from '@mui/material/FormControlLabel';
 
 export default function SignUpPage() {
   const router = useRouter()

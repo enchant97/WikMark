@@ -1,7 +1,7 @@
-import { Container } from "@mui/material";
 import WikiDrawer from "./_ui/WikiDrawer";
 import { joinSlugParts } from "@/lib/helpers";
 import { getRelPageSlugs } from "@/lib/actions";
+import Container from '@mui/material/Container';
 
 export default async function WikiLayout(props: LayoutProps<"/-/[[...slug]]">) {
   const { slug } = await props.params

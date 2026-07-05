@@ -1,4 +1,6 @@
-import { Button, Typography, ButtonProps } from "@mui/material"
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
+import { ButtonProps } from '@mui/material/Button';
 
 export default function ResponsiveButton(props: ButtonProps) {
   return (

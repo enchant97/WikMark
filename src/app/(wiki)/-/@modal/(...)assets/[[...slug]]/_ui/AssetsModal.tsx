@@ -1,13 +1,25 @@
-"use client"
-
+"use client";
 import { InlineSuccessAlert, InlineAppErrorAlert } from "@/components/InlineAlert"
 import { createAssetAction, deleteAssetAction } from "@/lib/actions"
 import { makeFullAssetSlug } from "@/lib/helpers"
-import { CloudUpload, DeleteForever } from "@mui/icons-material"
-import { Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Divider, Grid, IconButton, List, ListItem, ListItemButton, ListItemText } from "@mui/material"
+import CloudUpload from "@mui/icons-material/CloudUpload"
+import DeleteForever from "@mui/icons-material/DeleteForever"
 import Form from "next/form"
 import { useRouter } from "next/navigation"
 import { startTransition, Suspense, use, useActionState, useRef, useState } from "react"
+import Button from '@mui/material/Button';
+import CircularProgress from '@mui/material/CircularProgress';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import Divider from '@mui/material/Divider';
+import Grid from '@mui/material/Grid';
+import IconButton from '@mui/material/IconButton';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemText from '@mui/material/ListItemText';
 
 export default function AssetsModal(props: { fullSlug: string, assets: Promise<string[]> }) {
   const router = useRouter()

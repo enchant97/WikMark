@@ -1,5 +1,5 @@
 import { ErrorDTO } from "@/lib/errors";
-import { Alert } from "@mui/material";
+import Alert from '@mui/material/Alert';
 
 export enum AlertLevel {
   Success = "success",

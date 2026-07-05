@@ -1,14 +1,15 @@
-"use client"
+"use client";
 import dynamic from "next/dynamic";
 import { startTransition, useActionState, useState } from "react";
 import { updatePageContentsAction } from "@/lib/actions";
-import { ButtonGroup } from "@mui/material"
 import NextLink from "@/components/NextLink"
 import { HeaderMenu } from "@/components/WikiHeader";
-import { Cancel, Save } from "@mui/icons-material";
+import Cancel from "@mui/icons-material/Cancel";
+import Save from "@mui/icons-material/Save";
 import { InlineAppErrorAlert } from "@/components/InlineAlert";
 import ResponsiveButton from "@/components/ResponsiveButton";
 import { PageMetadata } from "@/lib/types";
+import ButtonGroup from '@mui/material/ButtonGroup';
 
 const Editor = dynamic(() => import("@/components/Editor"), { ssr: false })
 

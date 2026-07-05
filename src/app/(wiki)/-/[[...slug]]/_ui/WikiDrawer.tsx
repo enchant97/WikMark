@@ -1,5 +1,4 @@
-"use client"
-
+"use client";
 import React, { PropsWithChildren, use } from 'react';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
@@ -10,10 +9,10 @@ import MenuIcon from '@mui/icons-material/Menu';
 import Toolbar from '@mui/material/Toolbar';
 import WikiHeader from '@/components/WikiHeader';
 import WikiDrawerTree from './WikiDrawerTree';
-import { Search } from '@mui/icons-material';
-import { Stack, TextField } from '@mui/material';
 import Form from 'next/form';
 import SearchButton from './DrawerSearchButton';
+import Stack from '@mui/material/Stack';
+import TextField from '@mui/material/TextField';
 
 const drawerWidth = 240;
 

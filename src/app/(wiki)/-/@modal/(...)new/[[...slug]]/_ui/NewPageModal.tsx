@@ -1,12 +1,18 @@
-"use client"
+"use client";
 import { InlineAppErrorAlert } from "@/components/InlineAlert";
 import { createPageAction } from "@/lib/actions";
 import { intoPageSlug, intoPageSlugPart } from "@/lib/helpers";
 import { useModalNavigation } from "@/lib/ModalNavigationContext";
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, TextField } from "@mui/material";
 import Form from 'next/form'
 import { useRouter } from "next/navigation";
 import { useActionState, useEffect, useState } from "react";
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import Stack from '@mui/material/Stack';
+import TextField from '@mui/material/TextField';
 
 export default function NewPageModal(props: { parentSlug: string }) {
   const { closeAndNavigate } = useModalNavigation()
