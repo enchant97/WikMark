@@ -38,7 +38,7 @@ export default function SignUpPage() {
           {signupState?.error && !signupPending && <InlineAlert message={signupState.error.message} level={AlertLevel.Error} />}
           <Button variant="outlined" type="submit" loading={signupPending}>Sign-Up</Button>
           <Button variant="outlined" LinkComponent={NextLink} href="/auth/sign-in">Sign-In Instead?</Button>
-          <Button variant="outlined" LinkComponent={NextLink} href="/">Back Home</Button>
+          <Button variant="outlined" LinkComponent={NextLink} href="/-">Back Home</Button>
         </Stack>
       </Form>
     </>

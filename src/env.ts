@@ -11,7 +11,6 @@ const env = createEnv({
     AUTH_SECRET: z.base64().min(32),
   },
   client: {
-    NEXT_PUBLIC_ENABLE_LANDING: z.stringbool().default(true),
     NEXT_PUBLIC_ENABLE_SIGNUP: z.stringbool().default(true),
     NEXT_PUBLIC_ENABLE_CLIENT_RENDERING: z.stringbool().default(false),
     NEXT_PUBLIC_PUBLIC_URL: z.string().refine(
@@ -27,7 +26,6 @@ const env = createEnv({
     ),
   },
   experimental__runtimeEnv: {
-    NEXT_PUBLIC_ENABLE_LANDING: process.env.NEXT_PUBLIC_ENABLE_LANDING,
     NEXT_PUBLIC_ENABLE_SIGNUP: process.env.NEXT_PUBLIC_ENABLE_SIGNUP,
     NEXT_PUBLIC_PUBLIC_URL: process.env.NEXT_PUBLIC_PUBLIC_URL,
     NEXT_PUBLIC_ENABLE_CLIENT_RENDERING: process.env.NEXT_PUBLIC_ENABLE_CLIENT_RENDERING,

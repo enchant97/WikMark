@@ -37,7 +37,7 @@ export default function SignUpPage() {
           {signinState?.error && !signinPending && <InlineAlert message={signinState.error.message} level={AlertLevel.Error} />}
           <Button variant="outlined" type="submit" loading={signinPending}>Sign-In</Button>
           {env.NEXT_PUBLIC_ENABLE_SIGNUP && <Button variant="outlined" LinkComponent={NextLink} href="/auth/sign-up">Sign-Up Instead?</Button>}
-          <Button variant="outlined" LinkComponent={NextLink} href="/">Back Home</Button>
+          <Button variant="outlined" LinkComponent={NextLink} href="/-">Back Home</Button>
         </Stack>
       </Form>
     </>
