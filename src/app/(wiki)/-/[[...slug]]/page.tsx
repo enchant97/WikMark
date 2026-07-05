@@ -13,8 +13,22 @@ import ResponsiveButton from "@/components/ResponsiveButton"
 import { auth } from "@/lib/auth"
 import { headers } from "next/headers"
 import ButtonGroup from '@mui/material/ButtonGroup';
+import { Metadata } from "next"
 
 const RenderedPageClient = dynamic(() => import("./_ui/RenderedPageClient"))
+
+export async function generateMetadata(props: PageProps<"/-/[[...slug]]">): Promise<Metadata> {
+  const { slug } = await props.params
+  const fullSlug = joinSlugParts(slug)
+  const rawContentSlug = fullSlug === "" ? "_index.md" : `${fullSlug}.md`
+  return {
+    alternates: {
+      types: {
+        "text/markdown": `/api/raw/${rawContentSlug}`,
+      },
+    },
+  }
+}
 
 export default async function WikiViewPage(props: PageProps<"/-/[[...slug]]">) {
   const { slug } = await props.params
