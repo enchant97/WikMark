@@ -3,7 +3,8 @@ import env from "@/env"
 import { discoverPagePaths, IndexedPage, indexPagePath } from "./indexer"
 import { PageMetadata } from "@/lib/types"
 
-let db: Database.Database | null = null
+const globalForDb = globalThis
+let db: Database.Database | null = globalForDb.__search_db ?? null
 
 function getDb() {
   if (db !== null) {
@@ -23,6 +24,10 @@ function getDb() {
       tokenize = 'porter unicode61'
     )
   `)
+  if (process.env.NODE_ENV !== "production") {
+    // only set for when hot-reload is used
+    globalForDb.__search_db = db
+  }
   return db
 }
 
