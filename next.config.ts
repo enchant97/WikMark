@@ -10,6 +10,12 @@ const nextConfig: NextConfig = {
   experimental: {
     serverSourceMaps: false, // prevents OOM errors on build
   },
+  outputFileTracingExcludes: {
+    // prevents OOM errors on build
+    "*": [
+      "**/node_modules/@mui/icons-material/**",
+    ],
+  },
   enablePrerenderSourceMaps: false, // prevents OOM errors on build
 };
 
