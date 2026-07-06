@@ -17,6 +17,7 @@ export default function WikiEditor(props: {
   fullSlug: string,
   initialContent: string,
   metadata: PageMetadata,
+  baseUrl: string,
 }) {
   const [draftContent, setDraftContent] = useState(props.initialContent)
   const [savedContent, setSavedContent] = useState(props.initialContent)
@@ -52,6 +53,7 @@ export default function WikiEditor(props: {
         onChange={(v) => {
           setDraftContent(v)
         }}
+        baseUrl={props.baseUrl}
       />
     </>
   )

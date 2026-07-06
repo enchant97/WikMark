@@ -9,13 +9,11 @@ const env = createEnv({
     DB_PATH: z.coerce.string().refine(isAbsolute, { error: "Expected an absolute path" }),
     SEARCH_DB_PATH: z.coerce.string().refine(isAbsolute, { error: "Expected an absolute path" }),
     AUTH_SECRET: z.base64().min(32),
-  },
-  client: {
-    NEXT_PUBLIC_META_TITLE: z.string().default("WikMark"),
-    NEXT_PUBLIC_META_DESCRIPTION: z.string().default("A WikMark Wiki"),
-    NEXT_PUBLIC_ENABLE_SIGNUP: z.stringbool().default(true),
-    NEXT_PUBLIC_ENABLE_CLIENT_RENDERING: z.stringbool().default(false),
-    NEXT_PUBLIC_PUBLIC_URL: z.string().refine(
+    META_TITLE: z.string().default("WikMark"),
+    META_DESCRIPTION: z.string().default("A WikMark Wiki"),
+    ENABLE_SIGNUP: z.stringbool().default(true),
+    ENABLE_CLIENT_RENDERING: z.stringbool().default(false),
+    PUBLIC_URL: z.string().refine(
       (val) => {
         try {
           const url = new URL(val);
@@ -27,13 +25,7 @@ const env = createEnv({
       { message: 'Must be a valid http or https URL' }
     ),
   },
-  experimental__runtimeEnv: {
-    NEXT_PUBLIC_META_TITLE: process.env.NEXT_PUBLIC_META_TITLE,
-    NEXT_PUBLIC_META_DESCRIPTION: process.env.NEXT_PUBLIC_META_DESCRIPTION,
-    NEXT_PUBLIC_ENABLE_SIGNUP: process.env.NEXT_PUBLIC_ENABLE_SIGNUP,
-    NEXT_PUBLIC_PUBLIC_URL: process.env.NEXT_PUBLIC_PUBLIC_URL,
-    NEXT_PUBLIC_ENABLE_CLIENT_RENDERING: process.env.NEXT_PUBLIC_ENABLE_CLIENT_RENDERING,
-  },
+  experimental__runtimeEnv: {},
   emptyStringAsUndefined: true,
 })
 

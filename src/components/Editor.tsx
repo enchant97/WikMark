@@ -4,18 +4,20 @@ import { Crepe } from '@milkdown/crepe';
 import { Milkdown, MilkdownProvider, useEditor } from '@milkdown/react';
 import '@milkdown/crepe/theme/common/style.css';
 import "./Editor.css"
-import { pageContentUrlTransformer } from '@/lib/helpers';
 import urlTransformer from '@/lib/milkdownUrlTransformer';
+import { pageContentUrlTransformer } from '@/lib/helpers';
 
 export interface EditorProps {
-  pageId: string,
-  initialContent: string,
-  isReadOnly: boolean,
+  pageId: string
+  initialContent: string
+  isReadOnly: boolean
   onChange?: (content: string) => unknown
+  baseUrl: string
 }
 
-function EditorCore({ pageId, initialContent, isReadOnly, onChange }: EditorProps) {
+function EditorCore({ pageId, initialContent, isReadOnly, onChange, baseUrl }: EditorProps) {
   const crepeRef = useRef<Crepe>(null);
+  const appUrlTransformer = (url: string) => pageContentUrlTransformer(url, baseUrl)
 
   useEditor((root) => {
     const crepe = new Crepe({
@@ -28,12 +30,12 @@ function EditorCore({ pageId, initialContent, isReadOnly, onChange }: EditorProp
       featureConfigs: {
         [Crepe.Feature.Placeholder]: { text: 'Start writing here...' },
         [Crepe.Feature.ImageBlock]: {
-          proxyDomURL: (url) => pageContentUrlTransformer(url)
+          proxyDomURL: appUrlTransformer
         },
       },
     });
 
-    crepe.editor.use(urlTransformer(pageContentUrlTransformer))
+    crepe.editor.use(urlTransformer(appUrlTransformer))
     crepe.setReadonly(isReadOnly);
 
     crepe.on((api) => {

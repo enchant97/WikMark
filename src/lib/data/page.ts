@@ -5,6 +5,7 @@ import { isValidPageSlugFull, isValidPageSlugPart, renderMarkdown } from "@/lib/
 import { AppError, AppErrorCode } from "@/lib/errors";
 import { doesFileExist, getFullPath, isPathIndex } from "./helpers";
 import { PageMetadata, parsePageMetadata } from "../types";
+import env from "@/env";
 
 const INDEX_PAGE_NAME = "_index"
 
@@ -185,7 +186,7 @@ export async function getPageContentParts(fullSlug: string): Promise<PageContent
  * - internally calls `getPageContentRaw()`
  */
 export async function getPageContentAsHTML(fullSlug: string): Promise<string> {
-  return await renderMarkdown(await getPageContentRaw(fullSlug))
+  return await renderMarkdown(await getPageContentRaw(fullSlug), env.PUBLIC_URL)
 }
 
 /**

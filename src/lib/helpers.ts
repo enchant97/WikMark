@@ -5,7 +5,6 @@ import remarkGfm from "remark-gfm"
 import remarkParse from "remark-parse"
 import remarkRehype from "remark-rehype"
 import { unified } from "unified"
-import env from "@/env"
 import remarkUrlTransformer from "./remarkUrlTransformer"
 import remarkIndexable from "./remarkIndexable"
 
@@ -65,8 +64,8 @@ export function intoPageSlug(v: string): string {
 /**
  * Transform relative raw content oaths into correct api path
  */
-export function pageContentUrlTransformer(url: string): string {
-  const rawContentUrlBase = new URL("/api/raw/", env.NEXT_PUBLIC_PUBLIC_URL)
+export function pageContentUrlTransformer(url: string, baseUrl: string): string {
+  const rawContentUrlBase = new URL("/api/raw/", baseUrl)
   const isRawPathRegex = /^.+\..+$/
   if (isRawPathRegex.test(url)) {
     return new URL(url.replace(/^\//, ""), rawContentUrlBase).href
@@ -74,12 +73,12 @@ export function pageContentUrlTransformer(url: string): string {
   return url
 }
 
-export async function renderMarkdown(md: string | Buffer<ArrayBuffer>) {
+export async function renderMarkdown(md: string | Buffer<ArrayBuffer>, baseUrl: string) {
   return String(await unified()
     .use(remarkParse)
     .use(remarkFrontmatter)
     .use(remarkGfm)
-    .use(remarkUrlTransformer, { transformer: pageContentUrlTransformer })
+    .use(remarkUrlTransformer, { transformer: (url) => pageContentUrlTransformer(url, baseUrl) })
     .use(remarkRehype)
     .use(rehypeSanitize)
     .use(rehypeStringify)

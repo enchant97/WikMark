@@ -16,8 +16,8 @@ const roboto = Roboto({
 });
 
 export const metadata: Metadata = {
-  title: env.NEXT_PUBLIC_META_TITLE,
-  description: env.NEXT_PUBLIC_META_DESCRIPTION,
+  title: env.META_TITLE,
+  description: env.META_DESCRIPTION,
 };
 
 export default function RootLayout({

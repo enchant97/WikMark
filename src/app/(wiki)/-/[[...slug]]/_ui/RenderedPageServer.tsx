@@ -3,9 +3,10 @@ import { Suspense } from "react"
 import RenderedPageLoading from "./RenderedPageLoading"
 import PageFooter from "./PageFooter"
 import { PageMetadata } from "@/lib/types"
+import env from "@/env"
 
 async function Inner(props: { content: string }) {
-  const rendered = await renderMarkdown(props.content)
+  const rendered = await renderMarkdown(props.content, env.PUBLIC_URL)
   return <div className="wikiProse" dangerouslySetInnerHTML={{ __html: rendered }}></div>
 
 }

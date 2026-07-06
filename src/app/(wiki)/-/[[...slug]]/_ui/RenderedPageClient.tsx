@@ -5,11 +5,11 @@ import RenderedPageLoading from "./RenderedPageLoading"
 import { PageMetadata } from "@/lib/types";
 import PageFooter from "./PageFooter";
 
-export default function RenderedPageClient(props: { content: string, title: string, metadata: PageMetadata }) {
+export default function RenderedPageClient(props: { content: string, title: string, metadata: PageMetadata, baseUrl: string }) {
   const [rendered, setRendered] = useState<string | null>(null)
   useEffect(() => {
     const startTime = performance.now()
-    renderMarkdown(props.content).then(setRendered).then(() => {
+    renderMarkdown(props.content, props.baseUrl).then(setRendered).then(() => {
       const endTime = performance.now()
       const durationMs = Math.round(endTime - startTime)
       console.debug(`client-side markdown rendering took: ${durationMs}ms`)
