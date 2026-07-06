@@ -17,9 +17,9 @@ export default function SignUpPage() {
   const router = useRouter()
   const [signupState, dispatchSignup, signupPending] = useActionState(async (_prevData: unknown, form: FormData) => {
     return await authClient.signUp.email({
-      email: form.get("email")?.toString(),
-      password: form.get("password")?.toString(),
-      name: form.get("name")?.toString(),
+      email: form.get("email")?.toString() ?? "",
+      password: form.get("password")?.toString() ?? "",
+      name: form.get("name")?.toString() ?? "",
     }, {
       onSuccess: (_ctx) => {
         router.push("/-/")

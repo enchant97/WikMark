@@ -16,8 +16,8 @@ export default function SignUpPage() {
   const router = useRouter()
   const [signinState, dispatchSignin, signinPending] = useActionState(async (_prevData: unknown, form: FormData) => {
     return await authClient.signIn.email({
-      email: form.get("email")?.toString(),
-      password: form.get("password")?.toString(),
+      email: form.get("email")?.toString() ?? "",
+      password: form.get("password")?.toString() ?? "",
       rememberMe: form.get("rememberMe")?.toString() === "on",
     }, {
       onSuccess: (_ctx) => {
