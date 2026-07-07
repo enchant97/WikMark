@@ -2,14 +2,14 @@
 
 import { revalidatePath } from "next/cache"
 import { createPage, deletePage, getChildrenBySlug, getPageContentParts, renamePage, writePageContentParts } from "@/lib/data/page"
-import { createAsset, deleteAsset, getPageAssetsBySlug } from "@/lib/data/asset"
+import { deleteAsset, getPageAssetsBySlug } from "@/lib/data/asset"
 import { AppError, AppErrorCode } from "./errors"
 import { auth } from "./auth"
 import { headers } from "next/headers"
 import { after } from "next/server"
 import * as indexer from "@/lib/search/indexer"
 import * as searchDb from "@/lib/search/db"
-import { MaybePageMetadata, PageMetadata, parsePageMetadata } from "@/lib/types"
+import { PageMetadata } from "@/lib/types"
 
 async function isAuthenticated(): Promise<boolean> {
   return (await auth.api.getSession({ headers: await headers() })) !== null
@@ -51,61 +51,6 @@ export async function createPageAction(_prevState: unknown, formData: FormData) 
     return {
       success: true,
       fullSlug,
-    }
-  } catch (err) {
-    if (err instanceof AppError) {
-      return { error: err.intoDTO() }
-    }
-    throw err
-  }
-}
-
-export async function createAssetAction(_prevState: unknown, formData: FormData) {
-  const parentSlug = formData.get("parentSlug")?.toString()
-  const file = formData.get("file")?.valueOf()
-  try {
-    if (!await isAuthenticated()) { throwUnauthorized() }
-    if (parentSlug === undefined || (file === undefined || !(file instanceof File))) {
-      throw new AppError("form missing required fields", AppErrorCode.Validation)
-    }
-    await createAsset(parentSlug, file.name, file)
-    revalidatePath("/assets")
-    return {
-      success: true,
-      slug: file.name,
-    }
-  } catch (err) {
-    if (err instanceof AppError) {
-      return { error: err.intoDTO() }
-    }
-    throw err
-  }
-}
-
-export async function updatePageContentsAction(
-  _prevState: unknown,
-  payload: {
-    fullSlug: string,
-    content: string,
-    metadata: MaybePageMetadata,
-  },
-) {
-  try {
-    if (!await isAuthenticated()) { throwUnauthorized() }
-    const pageContentParts = {
-      content: payload.content,
-      metadata: {
-        ...parsePageMetadata(payload.metadata),
-        updatedAt: (new Date()).toISOString(),
-      },
-    }
-    await writePageContentParts(payload.fullSlug, pageContentParts)
-    after(async () => {
-      const indexedPage = await indexer.indexPageFromParts(payload.fullSlug, pageContentParts)
-      searchDb.updateIndexedPage(indexedPage)
-    })
-    return {
-      success: true,
     }
   } catch (err) {
     if (err instanceof AppError) {

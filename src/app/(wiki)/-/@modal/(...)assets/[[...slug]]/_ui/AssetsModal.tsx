@@ -1,6 +1,6 @@
 "use client";
 import { InlineSuccessAlert, InlineAppErrorAlert } from "@/components/InlineAlert"
-import { createAssetAction, deleteAssetAction } from "@/lib/actions"
+import { deleteAssetAction } from "@/lib/actions"
 import { makeFullAssetSlug } from "@/lib/helpers"
 import CloudUpload from "@mui/icons-material/CloudUpload"
 import DeleteForever from "@mui/icons-material/DeleteForever"
@@ -20,12 +20,25 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
+import { ErrorDTO } from "@/lib/errors";
+
+async function uploadAssetAction(_prevState, formData: FormData) {
+  const resp = await fetch("/api/upload/assets", {
+    method: "POST",
+    body: formData,
+  })
+  if (resp.ok) { return (await resp.json()) as { success: boolean } }
+  if (resp.headers.get("Content-Type") === "application/x.wikmark.error+json") {
+    return (await resp.json()) as { error: ErrorDTO }
+  }
+  throw new Error("action failed")
+}
 
 export default function AssetsModal(props: { fullSlug: string, assets: Promise<string[]> }) {
   const router = useRouter()
   const [open, setOpen] = useState(true)
   const [deleteState, dispatchDelete, deletePending] = useActionState(deleteAssetAction, null)
-  const [createState, dispatchCreate, createPending] = useActionState(createAssetAction, null)
+  const [createState, dispatchCreate, createPending] = useActionState(uploadAssetAction, null)
   const [deleting, setDeleting] = useState<string | null>(null)
   const createFormRef = useRef<HTMLFormElement | null>(null)
   const globalPending = deletePending || createPending

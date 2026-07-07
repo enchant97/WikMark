@@ -1,7 +1,6 @@
 "use client";
 import dynamic from "next/dynamic";
 import { startTransition, useActionState, useState } from "react";
-import { updatePageContentsAction } from "@/lib/actions";
 import NextLink from "@/components/NextLink"
 import { HeaderMenu } from "@/components/WikiHeader";
 import Cancel from "@mui/icons-material/Cancel";
@@ -10,8 +9,25 @@ import { InlineAppErrorAlert } from "@/components/InlineAlert";
 import ResponsiveButton from "@/components/ResponsiveButton";
 import { PageMetadata } from "@/lib/types";
 import ButtonGroup from '@mui/material/ButtonGroup';
+import { ErrorDTO } from "@/lib/errors";
 
 const Editor = dynamic(() => import("@/components/Editor"), { ssr: false })
+
+async function uploadPageContentAction(_prevState, payload: { fullSlug: string, content: string, metadata: PageMetadata }) {
+  const formData = new FormData()
+  formData.set("fullSlug", payload.fullSlug)
+  formData.set("content", payload.content)
+  formData.set("metadata", JSON.stringify(payload.metadata))
+  const resp = await fetch("/api/upload/pages", {
+    method: "POST",
+    body: formData,
+  })
+  if (resp.ok) { return (await resp.json()) as { success: boolean } }
+  if (resp.headers.get("Content-Type") === "application/x.wikmark.error+json") {
+    return (await resp.json()) as { error: ErrorDTO }
+  }
+  throw new Error("action failed")
+}
 
 export default function WikiEditor(props: {
   fullSlug: string,
@@ -21,7 +37,7 @@ export default function WikiEditor(props: {
 }) {
   const [draftContent, setDraftContent] = useState(props.initialContent)
   const [savedContent, setSavedContent] = useState(props.initialContent)
-  const [contentState, dispatchUpdateContent, updateContentPending] = useActionState(updatePageContentsAction, null)
+  const [contentState, dispatchUpdateContent, updateContentPending] = useActionState(uploadPageContentAction, null)
   const isSaved = draftContent === savedContent && !updateContentPending
   return (
     <>
