@@ -47,10 +47,11 @@ export function isValidPageSlugFull(slug: string, options?: { allowIndex?: boole
 
 export function isValidAssetSlugFull(slug: string): boolean {
   const parts = slug.split("/")
+  const end = parts.pop()
   for (const part of parts) {
-    if (!isValidAssetSlugPart(part)) { return false }
+    if (!isValidPageSlugPart(part)) { return false }
   }
-  return true
+  return isValidAssetSlugPart(end ?? "")
 }
 
 export function intoPageSlugPart(v: string): string {
