@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import "@/env"; // causes validation at build-time
 
 const nextConfig: NextConfig = {
   transpilePackages: ["@t3-oss/env-nextjs", "@t3-oss/env-core"],

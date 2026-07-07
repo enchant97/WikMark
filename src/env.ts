@@ -2,12 +2,17 @@ import { createEnv } from "@t3-oss/env-nextjs";
 import * as z from "zod";
 
 const isAbsolute = (s: string) => s.startsWith("/")
+const isValidSQLitePath = (s: string) => {
+  return s === ":memory:"
+    ? true
+    : isAbsolute(s)
+}
 
 const env = createEnv({
   server: {
     WIKI_PATH: z.coerce.string().refine(isAbsolute, { error: "Expected an absolute path" }),
-    DB_PATH: z.coerce.string().refine(isAbsolute, { error: "Expected an absolute path" }),
-    SEARCH_DB_PATH: z.coerce.string().refine(isAbsolute, { error: "Expected an absolute path" }),
+    DB_PATH: z.coerce.string().refine(isValidSQLitePath, { error: "Expected an absolute path" }),
+    SEARCH_DB_PATH: z.coerce.string().refine(isValidSQLitePath, { error: "Expected an absolute path" }),
     AUTH_SECRET: z.base64().min(32),
     META_TITLE: z.string().default("WikMark"),
     META_DESCRIPTION: z.string().default("A WikMark Wiki"),
