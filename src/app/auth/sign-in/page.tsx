@@ -1,7 +1,7 @@
 import env from "@/env";
 import SigninInner from "./_ui/SigninInner";
 
-export default function SignInPage() {
+export default async function SignInPage() {
   return (
     <>
       <h1>Sign-In</h1>
