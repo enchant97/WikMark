@@ -44,7 +44,7 @@ export default function NewPageModal(props: { parentSlug: string }) {
               name="title"
               label="Title"
               helperText="the title of the page (will display as h1)"
-              onChange={(ev) => setPageSlug(intoPageSlugPart(ev.currentTarget.value))}
+              onChange={(ev) => setPageSlug(intoPageSlugPart(ev.currentTarget.value).toLowerCase())}
               required
               fullWidth
             />
