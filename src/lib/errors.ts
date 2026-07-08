@@ -33,4 +33,26 @@ export class AppError extends Error {
       message: this.message,
     }
   }
+  intoStatusCode(): number {
+    switch (this.code) {
+      case AppErrorCode.Validation:
+        return 400
+      case AppErrorCode.NotFound:
+        return 404
+      case AppErrorCode.Conflict:
+        return 409
+      case AppErrorCode.Unauthorized:
+        return 401
+      default:
+        return 500
+    }
+  }
+  intoResponse() {
+    return Response.json({
+      error: this.intoDTO(),
+    }, {
+      status: this.intoStatusCode(),
+      headers: { "Content-Type": "application/x.wikmark.error+json" },
+    })
+  }
 }
