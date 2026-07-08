@@ -1,6 +1,5 @@
 "use client";
 import React, { PropsWithChildren, use } from 'react';
-import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import Drawer from '@mui/material/Drawer';
@@ -13,6 +12,7 @@ import Form from 'next/form';
 import SearchButton from './DrawerSearchButton';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
+import Header from '@/components/Header';
 
 const drawerWidth = 240;
 
@@ -58,7 +58,7 @@ export default function WikiDrawer(props: Props) {
 
   return (
     <Box sx={{ display: 'flex' }}>
-      <AppBar
+      <Header
         position="fixed"
         sx={{
           width: { sm: `calc(100% - ${drawerWidth}px)` },
@@ -77,7 +77,7 @@ export default function WikiDrawer(props: Props) {
           </IconButton>
           <WikiHeader breadcrumb={props.slugParts} />
         </Toolbar>
-      </AppBar>
+      </Header>
       <Box
         component="nav"
         sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}

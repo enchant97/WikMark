@@ -3,10 +3,10 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { joinSlugParts } from "@/lib/helpers";
 import { auth } from "@/lib/auth";
-import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import Toolbar from '@mui/material/Toolbar';
+import Header from "@/components/Header";
 
 export default async function WikiEditorLayout(props: LayoutProps<"/edit/[[...slug]]">) {
   const { slug } = await props.params
@@ -18,13 +18,13 @@ export default async function WikiEditorLayout(props: LayoutProps<"/edit/[[...sl
   }
   return (
     <Box sx={{ display: 'flex' }}>
-      <AppBar
+      <Header
         position="fixed"
       >
         <Toolbar>
           <WikiHeader breadcrumb={slug ?? []} />
         </Toolbar>
-      </AppBar>
+      </Header>
       <Container>
         <Toolbar />
         {props.children}
