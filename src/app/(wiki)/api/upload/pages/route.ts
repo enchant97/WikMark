@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
       throw new AppError("form missing required fields", AppErrorCode.Validation)
     }
     const pageContentParts = {
-      content,
+      content: content.replaceAll("\r\n", "\n"),
       metadata: {
         ...parsePageMetadata(JSON.parse(rawMetadata)),
         updatedAt: (new Date()).toISOString(),
