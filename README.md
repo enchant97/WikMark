@@ -65,11 +65,7 @@ Application configurations specified as environment variables.
 | PUBLIC_URL | Where site will be accessed from | |
 
 ## Roadmap
-This project is not to make a complex wiki management system, so there are not too many extra features to add. However, future features to come are listed below:
-
-- Print View
-- Authenticate over ODIC
-- Basic user roles: admin, editor, viewer
+[View here](ROADMAP.md)
 
 ## Support Me
 Like this project? Consider supporting me financially so I can continue development.
