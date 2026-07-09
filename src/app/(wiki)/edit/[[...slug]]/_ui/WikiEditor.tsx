@@ -63,7 +63,7 @@ export default function WikiEditor(props: {
       </HeaderMenu>
       {(contentState?.error && !updateContentPending) && <InlineAppErrorAlert err={contentState.error} />}
       <Editor
-        pageId={props.fullSlug}
+        pageSlug={props.fullSlug}
         initialContent={props.initialContent}
         isReadOnly={false}
         onChange={(v) => {

@@ -7,6 +7,7 @@ import remarkRehype from "remark-rehype"
 import { unified } from "unified"
 import remarkUrlTransformer from "./remarkUrlTransformer"
 import remarkIndexable from "./remarkIndexable"
+import { PageMetadata } from "./types"
 
 export function joinSlugParts(parts?: string[]): string {
   return (parts ?? []).join("/")
@@ -65,21 +66,22 @@ export function intoPageSlug(v: string): string {
 /**
  * Transform relative raw content oaths into correct api path
  */
-export function pageContentUrlTransformer(url: string, baseUrl: string): string {
-  const rawContentUrlBase = new URL("/api/raw/", baseUrl)
+export function pageContentUrlTransformer(url: string, ctx: { baseUrl: string, pageSlug: string }): string {
   const isRawPathRegex = /^.+\..+$/
   if (isRawPathRegex.test(url)) {
-    return new URL(url.replace(/^\//, ""), rawContentUrlBase).href
+    const pageSlug = ctx.pageSlug.endsWith("/") ? ctx.pageSlug : `${ctx.pageSlug}/`
+    const rawContentUrlBase = new URL(`/api/raw/${pageSlug}`, ctx.baseUrl)
+    return new URL(url, rawContentUrlBase).href
   }
   return url
 }
 
-export async function renderMarkdown(md: string | Buffer<ArrayBuffer>, baseUrl: string) {
+export async function renderMarkdown(md: string | Buffer<ArrayBuffer>, ctx: { baseUrl: string, pageSlug: string }) {
   return String(await unified()
     .use(remarkParse)
     .use(remarkFrontmatter)
     .use(remarkGfm)
-    .use(remarkUrlTransformer, { transformer: (url) => pageContentUrlTransformer(url, baseUrl) })
+    .use(remarkUrlTransformer, { transformer: (url) => pageContentUrlTransformer(url, ctx) })
     .use(remarkRehype)
     .use(rehypeSanitize)
     .use(rehypeStringify)
@@ -93,4 +95,8 @@ export async function renderToIndexable(md: string | Buffer<ArrayBuffer>) {
     .use(remarkGfm)
     .use(remarkIndexable)
     .process(md))
+}
+
+export function makePageTitle(slugParts?: string[], metadata?: PageMetadata): string {
+  return metadata?.title ?? (slugParts?.at(-1) ?? "Home")
 }

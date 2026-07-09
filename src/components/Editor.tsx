@@ -8,16 +8,16 @@ import urlTransformer from '@/lib/milkdownUrlTransformer';
 import { pageContentUrlTransformer } from '@/lib/helpers';
 
 export interface EditorProps {
-  pageId: string
+  pageSlug: string
   initialContent: string
   isReadOnly: boolean
   onChange?: (content: string) => unknown
   baseUrl: string
 }
 
-function EditorCore({ pageId, initialContent, isReadOnly, onChange, baseUrl }: EditorProps) {
+function EditorCore({ pageSlug, initialContent, isReadOnly, onChange, baseUrl }: EditorProps) {
   const crepeRef = useRef<Crepe>(null);
-  const appUrlTransformer = (url: string) => pageContentUrlTransformer(url, baseUrl)
+  const appUrlTransformer = (url: string) => pageContentUrlTransformer(url, { pageSlug, baseUrl })
 
   useEditor((root) => {
     const crepe = new Crepe({
@@ -46,7 +46,7 @@ function EditorCore({ pageId, initialContent, isReadOnly, onChange, baseUrl }: E
 
     crepeRef.current = crepe;
     return crepe; // @milkdown/react calls .create()/.destroy() automatically
-  }, [pageId]);
+  }, [pageSlug]);
 
   useEffect(() => {
     crepeRef.current?.setReadonly(isReadOnly);

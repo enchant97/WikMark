@@ -34,8 +34,8 @@ export default async function WikiViewPage(props: PageProps<"/-/[[...slug]]">) {
   const { slug } = await props.params
   const authSession = await auth.api.getSession({ headers: await headers() })
   const fullSlug = joinSlugParts(slug)
+  const baseUrl = `${env.PUBLIC_URL}/${fullSlug}`
   const pageContentParts = await getPageContentParts(fullSlug)
-  const pageTitle = pageContentParts.metadata?.title ?? (slug?.at(-1) ?? "Home")
 
   return (
     <>
@@ -50,8 +50,8 @@ export default async function WikiViewPage(props: PageProps<"/-/[[...slug]]">) {
         )}
       </HeaderMenu>
       {env.ENABLE_CLIENT_RENDERING
-        ? <RenderedPageClient content={pageContentParts.content} title={pageTitle} metadata={pageContentParts.metadata} baseUrl={env.PUBLIC_URL} />
-        : <RenderedPageServer content={pageContentParts.content} title={pageTitle} metadata={pageContentParts.metadata} />
+        ? <RenderedPageClient slugParts={slug} content={pageContentParts.content} metadata={pageContentParts.metadata} baseUrl={baseUrl} />
+        : <RenderedPageServer slugParts={slug} content={pageContentParts.content} metadata={pageContentParts.metadata} baseUrl={baseUrl} />
       }
     </>
   )

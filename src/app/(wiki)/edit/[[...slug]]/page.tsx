@@ -12,7 +12,7 @@ export default async function WikiEditPage(props: PageProps<"/edit/[[...slug]]">
       fullSlug={fullSlug}
       initialContent={initialContentParts.content}
       metadata={initialContentParts.metadata}
-      baseUrl={env.PUBLIC_URL}
+      baseUrl={`${env.PUBLIC_URL}/${fullSlug}`}
     />
   )
 }
