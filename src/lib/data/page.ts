@@ -181,15 +181,6 @@ export async function getPageContentParts(fullSlug: string): Promise<PageContent
 }
 
 /**
- * Get the page content rendered as HTML.
- *
- * - internally calls `getPageContentRaw()`
- */
-export async function getPageContentAsHTML(fullSlug: string): Promise<string> {
-  return await renderMarkdown(await getPageContentRaw(fullSlug), env.PUBLIC_URL)
-}
-
-/**
  * Write page content and given metadata.
  *
  * - internally calls `writePageContentRaw()`
