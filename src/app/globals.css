@@ -9,8 +9,16 @@
 
 .wikiProse pre {
   overflow-x: auto;
+  background-color: var(--mui-palette-grey-900);
+  color: var(--mui-palette-common-white);
+  border-radius: var(--mui-shape-borderRadius);
+  padding: .6rem;
 }
 
 .wikiProse code {
-  overflow-x: auto;
+  background-color: var(--mui-palette-grey-900);
+  color: var(--mui-palette-common-white);
+  border-radius: var(--mui-shape-borderRadius);
+  padding-inline: .4rem;
+  padding-block: .1rem
 }
