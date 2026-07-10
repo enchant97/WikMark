@@ -57,7 +57,7 @@ export default function WikiDrawer(props: Props) {
   );
 
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box sx={{ display: { sm: 'flex' } }}>
       <Header
         position="fixed"
         sx={{
