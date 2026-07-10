@@ -2,7 +2,7 @@ import path from "node:path";
 import * as fs from "node:fs/promises";
 import { isValidAssetSlugFull, isValidAssetSlugPart, isValidPageSlugFull, } from "@/lib/helpers";
 import { AppError, AppErrorCode } from "@/lib/errors";
-import { doesFileExist, getFullPath, isPathIndex } from "./helpers";
+import { doesDirExist, doesFileExist, getFullPath, isPathIndex } from "./helpers";
 
 /**
  * Get asset slugs (relative to parent) for given page slug.
@@ -104,6 +104,14 @@ export async function getRawContent(fullSlug: string) {
     return await fs.readFile(fullPath)
   } catch (err) {
     if (err.code === "ENOENT") {
+      if (path.extname(fullPath) === ".md") {
+        if (
+          isPathIndex(fullPath) ||
+          await doesDirExist(path.join(path.dirname(fullPath), path.basename(fullPath, ".md")))
+        ) {
+          return Buffer.alloc(0)
+        }
+      }
       throw new AppError(
         `given asset slug does not exist: '${fullSlug}'`,
         AppErrorCode.NotFound,

@@ -7,7 +7,19 @@ export const INDEX_PAGE_NAME = "_index"
 
 export async function doesFileExist(fullPath: string): Promise<boolean> {
   try {
-    if (!(await fs.stat(fullPath)).isFile) {
+    if (!(await fs.stat(fullPath)).isFile()) {
+      return false
+    }
+  } catch (err) {
+    if (err.code === "ENOENT") { return false }
+    throw err
+  }
+  return true
+}
+
+export async function doesDirExist(fullPath: string): Promise<boolean> {
+  try {
+    if (!(await fs.stat(fullPath)).isDirectory()) {
       return false
     }
   } catch (err) {
