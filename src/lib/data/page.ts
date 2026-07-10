@@ -1,11 +1,10 @@
 import path from "node:path";
 import * as fs from "node:fs/promises";
 import matter from "gray-matter";
-import { isValidPageSlugFull, isValidPageSlugPart, renderMarkdown } from "@/lib/helpers";
+import { isValidPageSlugFull, isValidPageSlugPart } from "@/lib/helpers";
 import { AppError, AppErrorCode } from "@/lib/errors";
 import { doesFileExist, getFullPath, isPathIndex } from "./helpers";
 import { PageMetadata, parsePageMetadata } from "../types";
-import env from "@/env";
 
 const INDEX_PAGE_NAME = "_index"
 
