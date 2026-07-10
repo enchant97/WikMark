@@ -3,18 +3,19 @@ import * as fs from "node:fs/promises";
 import matter from "gray-matter";
 import { isValidPageSlugFull, isValidPageSlugPart } from "@/lib/helpers";
 import { AppError, AppErrorCode } from "@/lib/errors";
-import { doesFileExist, getFullPath, isPathIndex } from "./helpers";
+import { doesFileExist, getFullPath, INDEX_PAGE_NAME, isPathIndex } from "./helpers";
 import { PageMetadata, parsePageMetadata } from "../types";
-
-const INDEX_PAGE_NAME = "_index"
 
 /**
  * Get the child page slugs (relative to parent) for given parent slug.
  *
  * - Expects a full page slug
  * - Performs slug validation
+ *
+ * @deprecated replace usage with `@lib/data/explore/getPageTree`
  */
 export async function getChildrenBySlug(currentSlug: string): Promise<string[]> {
+  // TODO replace usage with `@lib/data/explore/getPageTree`
   if (!isValidPageSlugFull(currentSlug, { allowIndex: true })) {
     throw new AppError(`invalid slug given: '${currentSlug}'`, AppErrorCode.Validation)
   }

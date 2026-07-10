@@ -9,8 +9,11 @@ import { doesFileExist, getFullPath, isPathIndex } from "./helpers";
  *
  * - Expects a full page slug
  * - Performs slug validation
+ *
+ * @deprecated replace usage with `@lib/data/explore/getAssetTree`
  */
 export async function* getPageAssetsBySlug(currentSlug: string): AsyncIterableIterator<string> {
+  // TODO replace usage with `@lib/data/explore/getAssetTree`
   if (!isValidPageSlugFull(currentSlug, { allowIndex: true })) {
     throw new AppError(`invalid slug given: '${currentSlug}'`, AppErrorCode.Validation)
   }

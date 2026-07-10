@@ -3,6 +3,8 @@ import env from "@/env";
 import * as fs from "node:fs/promises";
 import { AppError, AppErrorCode } from "@/lib/errors";
 
+export const INDEX_PAGE_NAME = "_index"
+
 export async function doesFileExist(fullPath: string): Promise<boolean> {
   try {
     if (!(await fs.stat(fullPath)).isFile) {

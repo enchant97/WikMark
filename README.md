@@ -41,6 +41,9 @@ ${WIKI_PATH}/
         another-asset.pdf
 ```
 
+## API
+WikMark provides a public API for external application usage. [See documentation here](API.md).
+
 ## Deployment Notes
 - WikMark performs no body size limits on requests, so you should put it behind a reverse-proxy that can
 - Designed to only be deployed in a standalone node environment
