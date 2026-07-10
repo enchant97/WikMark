@@ -64,16 +64,21 @@ export function intoPageSlug(v: string): string {
 }
 
 /**
- * Transform relative raw content oaths into correct api path
+ * Transform relative paths into correct format
  */
 export function pageContentUrlTransformer(url: string, ctx: { baseUrl: string, pageSlug: string }): string {
+  if (url.startsWith("http://") || url.startsWith("https://")) {
+    return url
+  }
   const isRawPathRegex = /^.+\..+$/
+  // transform asset link
   if (isRawPathRegex.test(url)) {
     const pageSlug = ctx.pageSlug.endsWith("/") ? ctx.pageSlug : `${ctx.pageSlug}/`
     const rawContentUrlBase = new URL(`/api/raw/${pageSlug}`, ctx.baseUrl)
     return new URL(url, rawContentUrlBase).href
   }
-  return url
+  // transform page link
+  return `/-${url.startsWith("/") ? "" : "/"}${url}`
 }
 
 export async function renderMarkdown(md: string | Buffer<ArrayBuffer>, ctx: { baseUrl: string, pageSlug: string }) {
