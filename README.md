@@ -24,6 +24,10 @@ Why Next.JS?
 
 Unlike most of my other projects where I have used less-established tech I wanted to learn a system used by many businesses. I also want to see how optimised it can get for being such a large and complex framework.
 
+E-Reader Support?
+
+Yes! You can setup the EWikMark proxy app, [available here](https://github.com/enchant97/EWikMark). This will give you a e-ink compatible viewer, also works well on low performance devices.
+
 ## Data
 - Page content is stored in a standard file/folder system, stored at: `WIKI_PATH`
 - User profiles are stored in a SQLite database at: `DB_PATH`
