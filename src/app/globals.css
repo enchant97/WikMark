@@ -22,3 +22,37 @@
   padding-inline: .4rem;
   padding-block: .1rem
 }
+
+.wikiProse input {
+  margin: 0 .4rem 0 0;
+}
+
+.wikiProse table {
+  width: auto;
+  max-width: 100%;
+  display: block;
+  overflow-x: auto;
+  border-collapse: collapse;
+}
+
+.wikiProse table th,
+.wikiProse table td {
+  padding: .3rem;
+}
+
+.wikiProse table th {
+  background-color: var(--mui-palette-grey-900);
+  color: var(--mui-palette-common-white);
+}
+
+.wikiProse table th:first-child {
+  border-top-left-radius: var(--mui-shape-borderRadius);
+}
+
+.wikiProse table th:last-child {
+  border-top-right-radius: var(--mui-shape-borderRadius);
+}
+
+.wikiProse table tbody tr:last-child td {
+  border-bottom: solid 2px var(--mui-palette-grey-900);
+}
