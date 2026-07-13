@@ -89,19 +89,19 @@ export async function deleteAsset(fullSlug: string) {
 }
 
 /**
- * Read raw file content from given slug.
+ * Get a readable file handle of raw file content from given slug.
  *
  * - Expects a slug with extension
  * - Can return raw markdown by using `.md`
  * - Performs slug validation
  */
-export async function getRawContent(fullSlug: string) {
+export async function getRawContentFile(fullSlug: string) {
   if (!isValidAssetSlugFull(fullSlug)) {
     throw new AppError(`invalid slug given: '${fullSlug}'`, AppErrorCode.Validation)
   }
   const fullPath = getFullPath(fullSlug)
   try {
-    return await fs.readFile(fullPath)
+    return await fs.open(fullPath, "r")
   } catch (err) {
     if (err.code === "ENOENT") {
       if (path.extname(fullPath) === ".md") {
@@ -109,7 +109,7 @@ export async function getRawContent(fullSlug: string) {
           isPathIndex(fullPath) ||
           await doesDirExist(path.join(path.dirname(fullPath), path.basename(fullPath, ".md")))
         ) {
-          return Buffer.alloc(0)
+          return null
         }
       }
       throw new AppError(

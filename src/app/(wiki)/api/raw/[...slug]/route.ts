@@ -1,15 +1,17 @@
-import type { NextRequest } from 'next/server'
+import { after, type NextRequest } from 'next/server'
 import { joinSlugParts } from "@/lib/helpers"
-import { getRawContent } from '@/lib/data/asset'
 import { AppError, AppErrorCode } from '@/lib/errors'
 import { notFound } from 'next/navigation'
+import { getRawContentFile } from '@/lib/data/asset'
 
 export async function GET(_req: NextRequest, ctx: RouteContext<"/api/raw/[...slug]">) {
   const { slug } = await ctx.params
   const fullSlug = joinSlugParts(slug)
+  let f
   try {
-    const rawContent = await getRawContent(fullSlug)
-    return new Response(rawContent, {
+    f = await getRawContentFile(fullSlug)
+    after(async () => f?.close())
+    return new Response(f?.readableWebStream() ?? Buffer.alloc(0), {
       headers: {
         "Content-Disposition": `inline; filename=${slug.at(-1)}`,
         "Content-Security-Policy": "default-src 'none'; style-src 'unsafe-inline'; sandbox",
