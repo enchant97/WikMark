@@ -28,7 +28,7 @@ Use this to discover pages from a search query.
 {
     "slug": "",
     "title": "",
-    "excerpt: "",
+    "excerpt": "",
     "rank": 0.0
 }
 ```
