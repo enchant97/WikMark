@@ -36,6 +36,7 @@ export default async function WikiViewPage(props: PageProps<"/-/[[...slug]]">) {
   const fullSlug = joinSlugParts(slug)
   const baseUrl = `${env.PUBLIC_URL}/${fullSlug}`
   const pageContentParts = await getPageContentParts(fullSlug)
+  const enablePageTitle = env.ENABLE_PAGE_TITLE
 
   return (
     <>
@@ -50,8 +51,8 @@ export default async function WikiViewPage(props: PageProps<"/-/[[...slug]]">) {
         )}
       </HeaderMenu>
       {env.ENABLE_CLIENT_RENDERING
-        ? <RenderedPageClient slugParts={slug} content={pageContentParts.content} metadata={pageContentParts.metadata} baseUrl={baseUrl} />
-        : <RenderedPageServer slugParts={slug} content={pageContentParts.content} metadata={pageContentParts.metadata} baseUrl={baseUrl} />
+        ? <RenderedPageClient slugParts={slug} content={pageContentParts.content} metadata={pageContentParts.metadata} baseUrl={baseUrl} enablePageTitle={enablePageTitle} />
+        : <RenderedPageServer slugParts={slug} content={pageContentParts.content} metadata={pageContentParts.metadata} baseUrl={baseUrl} enablePageTitle={enablePageTitle} />
       }
     </>
   )

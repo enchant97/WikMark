@@ -22,6 +22,7 @@ const env = createEnv({
     AUTH_SECRET: authSecretSchema,
     META_TITLE: z.string().default("WikMark"),
     META_DESCRIPTION: z.string().default("A WikMark Wiki"),
+    ENABLE_PAGE_TITLE: z.stringbool().default(true),
     ENABLE_SIGNUP: z.stringbool().default(true),
     ENABLE_CLIENT_RENDERING: z.stringbool().default(false),
     PUBLIC_URL: z.string().refine(

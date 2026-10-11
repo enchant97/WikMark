@@ -15,12 +15,13 @@ export default async function RenderedPageServer(props: {
   content: string,
   metadata: PageMetadata,
   baseUrl: string,
+  enablePageTitle: boolean,
 }) {
   const pageTitle = makePageTitle(props.slugParts, props.metadata)
   return (
     <Suspense fallback={<RenderedPageLoading />}>
       {/* hiding the header until content load is a stylistic choice */}
-      <h1>{pageTitle}</h1>
+      {props.enablePageTitle && <h1>{pageTitle}</h1>}
       <Inner content={props.content} pageSlug={joinSlugParts(props.slugParts)} baseUrl={props.baseUrl} />
       <PageFooter metadata={props.metadata} />
     </Suspense>

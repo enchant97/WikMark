@@ -10,6 +10,7 @@ export default function RenderedPageClient(props: {
   content: string,
   metadata: PageMetadata,
   baseUrl: string,
+  enablePageTitle: boolean,
 }) {
   const pageTitle = makePageTitle(props.slugParts, props.metadata)
   const pageSlug = joinSlugParts(props.slugParts)
@@ -27,7 +28,7 @@ export default function RenderedPageClient(props: {
       ? <RenderedPageLoading />
       : <>
         {/* hiding the header until content load is a stylistic choice */}
-        <h1>{pageTitle}</h1>
+        {props.enablePageTitle && <h1>{pageTitle}</h1>}
         <div className="wikiProse" dangerouslySetInnerHTML={{ __html: rendered }}></div>
         <PageFooter metadata={props.metadata} />
       </>

@@ -67,6 +67,7 @@ Application configurations specified as environment variables.
 | AUTH_SECRET | The authentication secret, base64 >=32 | |
 | META_TITLE | Wiki title shown in HTML meta | - |
 | META_DESCRIPTION | Wiki description shown in HTML meta | - |
+| ENABLE_PAGE_TITLE | Whether to show a page title `<h1>` on every wiki page | true |
 | ENABLE_SIGNUP | Allow new user signups | true |
 | ENABLE_CLIENT_RENDERING | Render markdown on client instead of server | false |
 | PUBLIC_URL | Where site will be accessed from | |
