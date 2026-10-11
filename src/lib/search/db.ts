@@ -24,6 +24,12 @@ function getDb() {
       tokenize = 'porter unicode61'
     )
   `)
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS pages_config(
+      key TEXT PRIMARY KEY,
+      value TEXT
+    )
+  `)
   if (process.env.NODE_ENV !== "production") {
     // only set for when hot-reload is used
     globalForDb.__search_db = db
@@ -113,14 +119,43 @@ async function reIndexPagePath(pagePath: string) {
 }
 
 export async function rebuildIndex() {
-  // TODO could implement content hashing, to make re-index faster?
-  // Would require new table field `content_hash UNINDEXED`
-  console.log("rebulding search index")
   const db = getDb()
+  const updateConfigStmt = db.prepare("INSERT OR REPLACE INTO pages_config(key, value) VALUES (@key, @value)")
+  const getConfigStmt = db.prepare("SELECT value FROM pages_config WHERE key = ?").pluck()
+
+  const createdAt = getConfigStmt.get("createdAt") as string | undefined
+  const version = getConfigStmt.get("version") as string | undefined
+  const isPending = getConfigStmt.get("isPending") as string | undefined
+
+  let rebuildRequired = false
+  if (isPending === "true") {
+    console.log("index in detected in pending state, rebuild required")
+    rebuildRequired = true
+  } else if (createdAt === undefined) {
+    console.log("index does not exist, rebuild required")
+    rebuildRequired = true
+  } else if (createdAt > (new Date()).toISOString()) {
+    console.log("index created in future, rebuild required")
+    rebuildRequired = true
+  } else if (version !== "1") {
+    console.log("index version incorrect, rebuild required")
+    rebuildRequired = true
+  }
+
+  if (!rebuildRequired) {
+    console.log(`skipping index build, using existing created at: '${createdAt}'`)
+    return
+  }
+
+  console.log("rebulding search index")
+  updateConfigStmt.run({ key: "isPending", value: "true" })
   db.exec("DELETE FROM pages_fts")
   const pagePaths = discoverPagePaths()
   for await (const pagePath of pagePaths) {
     console.log(`indexing: '${pagePath}'`)
     await reIndexPagePath(pagePath)
   }
+  updateConfigStmt.run({ key: "createdAt", value: (new Date()).toISOString() })
+  updateConfigStmt.run({ key: "version", value: "1" })
+  updateConfigStmt.run({ key: "isPending", value: "false" })
 }
