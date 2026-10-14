@@ -78,7 +78,7 @@ export function pageContentUrlTransformer(url: string, ctx: { baseUrl: string, p
     return new URL(url, rawContentUrlBase).href
   }
   // transform page link
-  return `/-${url.startsWith("/") ? "" : "/"}${url}`
+  return new URL(`/-${url.startsWith("/") ? "" : "/"}${url}`, ctx.baseUrl).href
 }
 
 export async function renderMarkdown(md: string | Buffer<ArrayBuffer>, ctx: { baseUrl: string, pageSlug: string }) {
