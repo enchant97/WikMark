@@ -1,10 +1,45 @@
-import { PropsWithChildren } from "react";
+import type { Metadata } from "next";
+import "./globals.css";
+import { AppRouterCacheProvider } from "@mui/material-nextjs/v16-appRouter";
+import { Roboto } from 'next/font/google';
+import { ThemeProvider } from '@mui/material/styles';
+import theme from '@/theme';
+import CssBaseline from '@mui/material/CssBaseline';
+import { ModalNavigationProvider } from "@/lib/ModalNavigationContext";
+import env from "@/env";
 import { HeaderMenuProvider } from "@/components/WikiHeader";
 
-export default function WikiLayout(props: PropsWithChildren) {
+const roboto = Roboto({
+  weight: ['300', '400', '500', '700'],
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-roboto',
+});
+
+export const metadata: Metadata = {
+  title: env.META_TITLE,
+  description: env.META_DESCRIPTION,
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
   return (
-    <HeaderMenuProvider>
-      {props.children}
-    </HeaderMenuProvider>
-  )
+    <html lang="en" className={`${roboto.variable}`}>
+      <body>
+        <AppRouterCacheProvider options={{ enableCssLayer: true }}>
+          <ThemeProvider theme={theme}>
+            <CssBaseline enableColorScheme={true} />
+            <ModalNavigationProvider>
+              <HeaderMenuProvider>
+                {children}
+              </HeaderMenuProvider>
+            </ModalNavigationProvider>
+          </ThemeProvider>
+        </AppRouterCacheProvider>
+      </body>
+    </html>
+  );
 }

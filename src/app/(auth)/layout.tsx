@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
-import "./globals.css";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v16-appRouter";
 import { Roboto } from 'next/font/google';
 import { ThemeProvider } from '@mui/material/styles';
-import theme from '../theme';
+import theme from '@/theme';
 import CssBaseline from '@mui/material/CssBaseline';
 import { ModalNavigationProvider } from "@/lib/ModalNavigationContext";
 import env from "@/env";
