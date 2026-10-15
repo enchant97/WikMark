@@ -17,7 +17,7 @@ export interface EditorProps {
 
 function EditorCore({ pageSlug, initialContent, isReadOnly, onChange, baseUrl }: EditorProps) {
   const crepeRef = useRef<Crepe>(null);
-  const appUrlTransformer = (url: string) => pageContentUrlTransformer(url, { pageSlug, baseUrl })
+  const appUrlTransformer = (url: string) => pageContentUrlTransformer(url, { pageSlug, baseUrl, basePageUrl: baseUrl })
 
   useEditor((root) => {
     const crepe = new Crepe({

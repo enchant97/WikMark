@@ -5,7 +5,7 @@ import PageFooter from "./PageFooter"
 import { PageMetadata } from "@/lib/types"
 
 async function Inner(props: { content: string, pageSlug: string, baseUrl: string }) {
-  const rendered = await renderMarkdown(props.content, { pageSlug: props.pageSlug, baseUrl: props.baseUrl })
+  const rendered = await renderMarkdown(props.content, { pageSlug: props.pageSlug, baseUrl: props.baseUrl, basePageUrl: props.baseUrl })
   return <div className="wikiProse" dangerouslySetInnerHTML={{ __html: rendered }}></div>
 
 }

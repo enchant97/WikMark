@@ -66,9 +66,16 @@ export function intoPageSlug(v: string): string {
 /**
  * Transform relative paths into correct format
  */
-export function pageContentUrlTransformer(url: string, ctx: { baseUrl: string, pageSlug: string }): string {
+export function pageContentUrlTransformer(url: string, ctx: {
+  baseUrl: string,
+  basePageUrl: string,
+  pageSlug: string,
+}): string {
   if (url.startsWith("http://") || url.startsWith("https://")) {
     return url
+  }
+  if (!ctx.basePageUrl.endsWith("/")) {
+    ctx.basePageUrl = `${ctx.basePageUrl}/`
   }
   const isRawPathRegex = /^.+\..+$/
   // transform asset link
@@ -78,10 +85,14 @@ export function pageContentUrlTransformer(url: string, ctx: { baseUrl: string, p
     return new URL(url, rawContentUrlBase).href
   }
   // transform page link
-  return new URL(`/-${url.startsWith("/") ? "" : "/"}${url}`, ctx.baseUrl).href
+  return new URL(`-${url.startsWith("/") ? "" : "/"}${url}`, ctx.basePageUrl).href
 }
 
-export async function renderMarkdown(md: string | Buffer<ArrayBuffer>, ctx: { baseUrl: string, pageSlug: string }) {
+export async function renderMarkdown(md: string | Buffer<ArrayBuffer>, ctx: {
+  baseUrl: string,
+  basePageUrl: string,
+  pageSlug: string,
+}) {
   return String(await unified()
     .use(remarkParse)
     .use(remarkFrontmatter)

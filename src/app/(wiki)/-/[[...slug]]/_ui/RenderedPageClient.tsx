@@ -17,7 +17,7 @@ export default function RenderedPageClient(props: {
   const [rendered, setRendered] = useState<string | null>(null)
   useEffect(() => {
     const startTime = performance.now()
-    renderMarkdown(props.content, { baseUrl: props.baseUrl, pageSlug }).then(setRendered).then(() => {
+    renderMarkdown(props.content, { baseUrl: props.baseUrl, basePageUrl: props.baseUrl, pageSlug }).then(setRendered).then(() => {
       const endTime = performance.now()
       const durationMs = Math.round(endTime - startTime)
       console.debug(`client-side markdown rendering took: ${durationMs}ms`)
