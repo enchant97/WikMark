@@ -14,6 +14,7 @@ Performant markdown based wiki. Storing data on the standard file-system, ensuri
 - Visual markdown editor
 - Full-Text Search
 - User accounts
+- E-Reader compatible reader mode
 
 ## FAQ
 Why another wiki app?
@@ -26,7 +27,7 @@ Unlike most of my other projects where I have used less-established tech I wante
 
 E-Reader Support?
 
-Yes! You can setup the EWikMark proxy app, [available here](https://github.com/enchant97/EWikMark). This will give you a e-ink compatible viewer, also works well on low performance devices.
+Yes! Switch to the "Reader" mode and this will give you a e-ink compatible viewer, also works well on low performance devices.
 
 ## Data
 - Page content is stored in a standard file/folder system, stored at: `WIKI_PATH`

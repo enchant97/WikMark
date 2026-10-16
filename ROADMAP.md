@@ -4,5 +4,4 @@ This project is not to make a complex wiki management system, so there are not t
 - Print View
 - Authenticate over OIDC
 - Basic user roles: admin, editor, viewer
-- E-Reader mode - a e-ink friendly viewer
 - Ability to render wiki as static site
