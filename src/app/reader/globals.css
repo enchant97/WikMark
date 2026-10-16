@@ -1,0 +1,121 @@
+.siteHeader {
+  display: flex;
+  align-items: center;
+}
+
+.siteHeader nav {
+  margin-right: auto;
+}
+
+.siteHeader ul,
+.siteHeader menu {
+  display: flex;
+  align-items: center;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.siteHeader li:not(:last-child) {
+  margin-right: 0.3rem;
+}
+
+.siteFooter {
+  text-align: center;
+}
+
+.link,
+.btn {
+  font-family: sans-serif;
+}
+
+.btn {
+  text-decoration: none;
+  border: solid black 2px;
+  padding: .6rem .4rem;
+  border-radius: 12px;
+  color: black;
+  font-size: 1em;
+  background-color: white;
+  cursor: pointer;
+}
+
+.btn:hover,
+.btn:active,
+.btn:focus,
+.btn:focus-visible {
+  border-style: dashed;
+  outline: none;
+}
+
+.inputRadio {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border: solid black 2px;
+  border-radius: 5px;
+}
+
+.inputRadio:checked {
+  border-width: 6px;
+}
+
+fieldset {
+  border: dotted black 2px;
+}
+
+.linkNav li {
+  margin: .2rem 0;
+}
+
+.prose {
+  margin: auto;
+}
+
+.prose pre {
+  overflow-x: auto;
+  display: block;
+  border: dotted black 2px;
+  padding: .6rem;
+  border-radius: 12px;
+}
+
+.fontScale-sm {
+  font-size: 0.8em;
+}
+
+.fontScale-md {
+  font-size: 1.0em;
+}
+
+.fontScale-lg {
+  font-size: 1.3em;
+}
+
+.fontScale-xl {
+  font-size: 1.6em;
+}
+
+.textAlign-justify {
+  text-align: justify;
+}
+
+.textAlign-center {
+  text-align: center;
+}
+
+.maxWidth-sm {
+  max-width: 60vw;
+}
+
+.maxWidth-md {
+  max-width: 80vw;
+}
+
+.maxWidth-lg {
+  max-width: 90vw;
+}
+
+.maxWidth-full {
+  max-width: 100%;
+}

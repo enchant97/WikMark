@@ -5,11 +5,13 @@ import { createPage, deletePage, getChildrenBySlug, getPageContentParts, renameP
 import { deleteAsset, getPageAssetsBySlug } from "@/lib/data/asset"
 import { AppError, AppErrorCode } from "./errors"
 import { auth } from "./auth"
-import { headers } from "next/headers"
+import { cookies, headers } from "next/headers"
 import { after } from "next/server"
 import * as indexer from "@/lib/search/indexer"
 import * as searchDb from "@/lib/search/db"
-import { PageMetadata } from "@/lib/types"
+import { PageMetadata, parseReaderSettings } from "@/lib/types"
+import { redirect } from "next/navigation"
+import env from "@/env"
 
 async function isAuthenticated(): Promise<boolean> {
   return (await auth.api.getSession({ headers: await headers() })) !== null
@@ -139,4 +141,41 @@ export async function deleteAssetAction(_prevState: unknown, payload: { fullSlug
 
 export async function getSearchResults(query: string) {
   return searchDb.getSearchResults(query, 12)
+}
+
+export async function getReaderSettings() {
+  // TODO enable cacheComponents
+  // "use cache: private"
+  // cacheTag("readerSettings")
+  // cacheLife({ stale: Infinity })
+  const cookieStore = await cookies()
+  const settingsCookie = cookieStore.get("WikMark.reader_settings")
+  if (settingsCookie) {
+    try {
+      return parseReaderSettings(JSON.parse(decodeURIComponent(settingsCookie.value)))
+    } catch { }
+  }
+  // no settings (or invalid), use defaults
+  return parseReaderSettings(undefined)
+}
+
+export async function setReaderSettings(formData: FormData) {
+  const unsafeSettings = {
+    fontScale: formData.get("fontScale")?.toString(),
+    textAlign: formData.get("textAlign")?.toString(),
+    maxWidth: formData.get("maxWidth")?.toString(),
+  }
+  const newSettings = parseReaderSettings(unsafeSettings)
+  const cookieStore = await cookies()
+  cookieStore.set({
+    name: "WikMark.reader_settings",
+    value: encodeURIComponent(JSON.stringify(newSettings)),
+    path: "/reader",
+    expires: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+    httpOnly: true,
+    secure: env.PUBLIC_URL.startsWith("https://"),
+    sameSite: "strict",
+  })
+  // revalidateTag("readerSettings") // TODO enable cacheComponents
+  redirect("/reader/-")
 }
