@@ -27,6 +27,7 @@ WORKDIR ${WORKDIR_APP}
 COPY --from=builder --link ${WORKDIR_SRC}/.next/standalone ./
 COPY --from=builder --link ${WORKDIR_SRC}/.next/static ./.next/static
 #COPY --from=builder --link ${WORKDIR_SRC}/public ./public
+COPY ./docs ./docs
 
 ENV NODE_ENV="production"
 ENV NEXT_TELEMETRY_DISABLED=1

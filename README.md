@@ -15,6 +15,7 @@ Performant markdown based wiki. Storing data on the standard file-system, ensuri
 - Full-Text Search
 - User accounts
 - E-Reader compatible reader mode
+- REST API for integration with other services like LLM's ([see docs](./docs/API.md))
 
 ## FAQ
 Why another wiki app?
@@ -29,49 +30,10 @@ E-Reader Support?
 
 Yes! Switch to the "Reader" mode and this will give you a e-ink compatible viewer, also works well on low performance devices.
 
-## Data
-- Page content is stored in a standard file/folder system, stored at: `WIKI_PATH`
-- User profiles are stored in a SQLite database at: `DB_PATH`
-- Search index is stored in a SQLite database at: `SEARCH_DB_PATH`, this is safe to delete and will regenerate on startup
-
-Page content is structured in the following way:
-
-```
-${WIKI_PATH}/
-    _index.md <--- Wiki Home Page
-    asset.jpg
-    my-path.md
-    my-path/
-        amazing-page.md
-        another-asset.pdf
-```
-
-## API
-WikMark provides a public API for external application usage. [See documentation here](API.md).
-
-## Deployment Notes
-- WikMark performs no body size limits on requests, so you should put it behind a reverse-proxy that can
-- Designed to only be deployed in a standalone node environment
-
-## Configuration
-Application configurations specified as environment variables.
-
-> Defaults shown here; assumes using the Docker deployment
-
-| Name | Description | Default |
-| :--  | :---------- | :------ |
-| HOSTNAME | Where to listen for requests | 0.0.0.0 |
-| PORT | What port to listen on | 8080 |
-| WIKI_PATH | Where the wiki pages/assets are stored | `/opt/wikmark/data/wiki` |
-| DB_PATH | main database filepath | `/opt/wikmark/data/db.sqlite` |
-| SEARCH_DB_PATH | Search index database filepath | `/opt/wikmark/data/search.db.sqlite` |
-| AUTH_SECRET | The authentication secret, base64 >=32 | |
-| META_TITLE | Wiki title shown in HTML meta | - |
-| META_DESCRIPTION | Wiki description shown in HTML meta | - |
-| ENABLE_PAGE_TITLE | Whether to show a page title `<h1>` on every wiki page | true |
-| ENABLE_SIGNUP | Allow new user signups | true |
-| ENABLE_CLIENT_RENDERING | Render markdown on client instead of server | false |
-| PUBLIC_URL | Where site will be accessed from | |
+## Docs
+- [INSTALL](docs/INSTALL.md)
+- [DATA](docs/DATA.md)
+- [API](docs/API.md)
 
 ## Roadmap
 [View here](ROADMAP.md)
