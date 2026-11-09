@@ -16,20 +16,20 @@
     "@emotion/cache": "^11.14.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
-    "@milkdown/crepe": "^7.22.2",
-    "@milkdown/prose": "^7.22.2",
-    "@milkdown/react": "^7.22.2",
-    "@milkdown/utils": "^7.22.2",
-    "@mui/icons-material": "^9.4.0",
-    "@mui/material": "^9.4.0",
-    "@mui/material-nextjs": "^9.4.0",
+    "@milkdown/crepe": "^7.23.0",
+    "@milkdown/prose": "^7.23.0",
+    "@milkdown/react": "^7.23.0",
+    "@milkdown/utils": "^7.23.0",
+    "@mui/icons-material": "^9.5.0",
+    "@mui/material": "^9.5.0",
+    "@mui/material-nextjs": "^9.5.0",
     "@t3-oss/env-nextjs": "^0.13.11",
-    "better-auth": "^1.7.7",
+    "better-auth": "^1.7.18",
     "better-sqlite3": "^12.11.1",
     "gray-matter": "^4.0.3",
-    "next": "16.4.0",
-    "react": "19.3.0",
-    "react-dom": "19.3.0",
+    "next": "16.4.5",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
     "rehype-sanitize": "^6.0.0",
     "rehype-stringify": "^10.0.1",
     "remark-frontmatter": "^5.0.0",
@@ -37,8 +37,8 @@
     "remark-parse": "^11.0.0",
     "remark-rehype": "^11.1.2",
     "unified": "^11.0.5",
-    "unist-util-visit": "^5.1.0",
-    "zod": "^4.6.5"
+    "unist-util-visit": "^5.2.0",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.13",
@@ -47,8 +47,8 @@
     "@types/react-dom": "19.3.0",
     "@types/unist": "^3.0.3",
     "eslint": "9.39.5",
-    "eslint-config-next": "16.4.0",
+    "eslint-config-next": "16.4.5",
     "typescript": "^6.0.3"
   },
-  "packageManager": "pnpm@11.10.0+sha512.0b7f8b98060031904c017e3a41eb187a16d40eeb829b95c4f8cb03681761fc4ab53dd219115b9b447f4dce1a05a214764461e7d3703392a9f32f9511ce8c86c8"
+  "packageManager": "pnpm@12.18.0+sha512.9d7882d5dc82147ecfc4e062aa34834e0ad0296710a1837a1115ae012127d36b7109e321ac1598a1dd0a65597681b1e99917e12ed0d749eae91187943363beb3"
 }
