@@ -46,19 +46,45 @@ function escapeLike(s: string) {
 }
 
 
+export interface MatchSegment {
+  type: "text" | "match"
+  /** raw content, not sanitised! */
+  content: string
+}
+
 export interface SearchResult {
   slug: string
   title: string
+  /** raw excerpt, not sanitised! */
   excerpt: string
+  segments: MatchSegment[]
   rank: number
 }
 
-export function getSearchResults(query: string, limit: number) {
+export function excerptToSegments(excerpt: string) {
+  const segments: MatchSegment[] = []
+  const re = /\u0001(.*?)\u0002/gs
+  let last = 0
+  for (const m of excerpt.matchAll(re)) {
+    const start = m.index!
+    if (start > last) {
+      segments.push({ type: "text", content: excerpt.slice(last, start) })
+    }
+    segments.push({ type: "match", content: m[1] })
+    last = start + m[0].length
+  }
+  if (last < excerpt.length) {
+    segments.push({ type: "text", content: excerpt.slice(last) })
+  }
+  return segments
+}
+
+export function getSearchResults(query: string, limit: number): SearchResult[] {
   const MARK_START = '\u0001'
   const MARK_END = '\u0002'
 
   if (!Number.isInteger(limit) || limit < 0) {
-    throw new Error("limit must not be a non-negative integer")
+    throw new Error("limit must be a non-negative integer")
   }
 
   // prevent empty queries & add limits
@@ -90,19 +116,14 @@ export function getSearchResults(query: string, limit: number) {
     ORDER BY rank
     LIMIT ?
   `).all(MARK_START, MARK_END, ftsQuery, limit)
-  // TODO return better excerpt without the need to escape.
-  //      instead text/match segments that JSX can process handle
   return rows.map(r => ({
     ...r,
     title: r.title,
-    excerpt: r.excerpt.replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;')
-      .replaceAll(MARK_START, '<mark>')
-      .replaceAll(MARK_END, '</mark>'),
-  })) as SearchResult[]
+    excerpt: r.excerpt
+      .replaceAll(MARK_START, "")
+      .replaceAll(MARK_END, ""),
+    segments: excerptToSegments(r.excerpt),
+  }))
 }
 
 export function deleteIndexedPage(slug: string, options: { children: boolean } = { children: true }) {

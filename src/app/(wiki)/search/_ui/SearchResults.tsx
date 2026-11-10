@@ -29,7 +29,10 @@ export default function SearchResults(props: {
               <Typography variant="subtitle1">{result.title || "-"}</Typography>
               <Typography variant="body2" sx={{ fontStyle: "italic" }}>{result.slug || "_index"}</Typography>
               <Typography variant="body2">
-                <span dangerouslySetInnerHTML={{ __html: result.excerpt }} />
+                {result.segments.map((seg, i) => seg.type === "match"
+                  ? <mark key={i}>{seg.content}</mark>
+                  : <span key={i}>{seg.content}</span>
+                )}
               </Typography>
             </Stack>
           </ListItemButton>
