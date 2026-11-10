@@ -50,20 +50,34 @@ export interface SearchResult {
 }
 
 export function getSearchResults(query: string, limit: number) {
+  const MARK_START = '\u0001'
+  const MARK_END = '\u0002'
   if (!Number.isInteger(limit) || limit < 0) {
     throw new Error("limit must not be a non-negative integer")
   }
-  const ftsQuery = query.split(/\s+/).map(v => `"${v.replace(/"/g, ' ')}"*`).join(' AND ');
+  const ftsQuery = query.split(/\s+/).map(v => `"${v.replace(/"/g, ' ')}"*`).join(' AND ')
   const rows = getDb().prepare(`
     SELECT slug, title,
-           snippet(pages_fts, 2, '<mark>', '</mark>', '…', 12) AS excerpt,
+           snippet(pages_fts, 2, ?, ?, '…', 12) AS excerpt,
            rank
     FROM pages_fts
     WHERE pages_fts MATCH ?
     ORDER BY rank
     LIMIT ?
-  `).all(ftsQuery, limit);
-  return rows as SearchResult[]
+  `).all(MARK_START, MARK_END, ftsQuery, limit)
+  // TODO return better excerpt without the need to escape.
+  //      instead text/match segments that JSX can process handle
+  return rows.map(r => ({
+    ...r,
+    title: r.title,
+    excerpt: r.excerpt.replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;')
+      .replaceAll(MARK_START, '<mark>')
+      .replaceAll(MARK_END, '</mark>'),
+  })) as SearchResult[]
 }
 
 export function deleteIndexedPage(slug: string, options: { children: boolean } = { children: true }) {

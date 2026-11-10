@@ -118,6 +118,11 @@ export function combineFrontmatter(md: string, frontmatter: Object) {
   return `---\n${rawFrontmatter}---\n${md}`
 }
 
+/**
+ * Transform markdown into a indexable plain-text.
+ *
+ * Requires escaping if including directly into HTML.
+ */
 export async function renderToIndexable(md: string | Buffer<ArrayBuffer>) {
   return String(await unified()
     .use(remarkParse)
