@@ -1,7 +1,6 @@
 import path from "node:path";
 import * as fs from "node:fs/promises";
-import matter from "gray-matter";
-import { isValidPageSlugFull, isValidPageSlugPart } from "@/lib/helpers";
+import { isValidPageSlugFull, isValidPageSlugPart, extractFrontmatter, combineFrontmatter } from "@/lib/helpers";
 import { AppError, AppErrorCode } from "@/lib/errors";
 import { doesFileExist, getFullPath, INDEX_PAGE_NAME, isPathIndex } from "./helpers";
 import { PageMetadata, parsePageMetadata } from "../types";
@@ -69,7 +68,7 @@ export async function createPage(parentSlug: string, slug: string, metadata: Pag
   } else if (parentSlug === "" && slug === INDEX_PAGE_NAME) {
     throw new AppError(`invalid slug given: '${slug}'`, AppErrorCode.Validation)
   }
-  const rawContent = matter.stringify("", metadata)
+  const rawContent = combineFrontmatter("", metadata)
   if (parentSlug !== "") {
     await fs.mkdir(getFullPath(parentSlug), { recursive: true })
   }
@@ -165,7 +164,7 @@ export interface PageContentParts {
  */
 export async function getPageContentParts(fullSlug: string): Promise<PageContentParts> {
   const contentRaw = await getPageContentRaw(fullSlug)
-  const { content, data } = matter(contentRaw)
+  const { content, data } = extractFrontmatter(contentRaw)
   try {
     const metadata = parsePageMetadata(data)
     return {
@@ -186,7 +185,7 @@ export async function getPageContentParts(fullSlug: string): Promise<PageContent
  * - internally calls `writePageContentRaw()`
  */
 export async function writePageContentParts(fullSlug: string, contentParts: PageContentParts) {
-  const contentRaw = matter.stringify(contentParts.content, contentParts.metadata)
+  const contentRaw = combineFrontmatter(contentParts.content, contentParts.metadata)
   writePageContentRaw(fullSlug, contentRaw)
 }
 

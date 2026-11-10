@@ -5,6 +5,9 @@ import remarkGfm from "remark-gfm"
 import remarkParse from "remark-parse"
 import remarkRehype from "remark-rehype"
 import { unified } from "unified"
+import { VFile } from 'vfile'
+import { matter } from 'vfile-matter'
+import { stringify } from 'yaml'
 import remarkUrlTransformer from "./remarkUrlTransformer"
 import remarkIndexable from "./remarkIndexable"
 import { PageMetadata } from "./types"
@@ -102,6 +105,17 @@ export async function renderMarkdown(md: string | Buffer<ArrayBuffer>, ctx: {
     .use(rehypeSanitize)
     .use(rehypeStringify)
     .process(md))
+}
+
+export function extractFrontmatter(md: string | Buffer<ArrayBuffer>) {
+  let f = new VFile(md)
+  matter(f, { strip: true })
+  return { content: String(f), data: f.data.matter }
+}
+
+export function combineFrontmatter(md: string, frontmatter: Object) {
+  const rawFrontmatter = stringify(frontmatter)
+  return `---\n${rawFrontmatter}---\n${md}`
 }
 
 export async function renderToIndexable(md: string | Buffer<ArrayBuffer>) {
