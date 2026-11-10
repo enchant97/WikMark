@@ -3,6 +3,10 @@ import env from "@/env"
 import { discoverPagePaths, IndexedPage, indexPagePath } from "./indexer"
 import { PageMetadata } from "@/lib/types"
 
+const MAX_SQ_LENGTH = 256
+const MAX_SQ_TERMS = 8
+const MAX_SQ_TERM_LENGTH = 50
+
 const globalForDb = globalThis
 let db: Database.Database | null = globalForDb.__search_db ?? null
 
@@ -52,10 +56,31 @@ export interface SearchResult {
 export function getSearchResults(query: string, limit: number) {
   const MARK_START = '\u0001'
   const MARK_END = '\u0002'
+
   if (!Number.isInteger(limit) || limit < 0) {
     throw new Error("limit must not be a non-negative integer")
   }
-  const ftsQuery = query.split(/\s+/).map(v => `"${v.replace(/"/g, ' ')}"*`).join(' AND ')
+
+  // prevent empty queries & add limits
+  const terms = query
+    .slice(0, MAX_SQ_LENGTH)
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, MAX_SQ_TERMS)
+    .map(t => t.slice(0, MAX_SQ_TERM_LENGTH))
+
+  if (terms.length === 0) { return [] }
+
+  const ftsQuery = terms
+    .map((v, i) => {
+      const quoted = `"${v.replace(/"/g, ' ')}"`;
+      // Only prefix-match the last term,
+      // and only if it's at least 2 characters.
+      const isLast = i === terms.length - 1;
+      return isLast && v.length >= 2 ? `${quoted}*` : quoted;
+    })
+    .join(' AND ')
+
   const rows = getDb().prepare(`
     SELECT slug, title,
            snippet(pages_fts, 2, ?, ?, '…', 12) AS excerpt,
