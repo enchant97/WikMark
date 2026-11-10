@@ -50,6 +50,9 @@ export interface SearchResult {
 }
 
 export function getSearchResults(query: string, limit: number) {
+  if (!Number.isInteger(limit) || limit < 0) {
+    throw new Error("limit must not be a non-negative integer")
+  }
   const ftsQuery = query.split(/\s+/).map(v => `"${v.replace(/"/g, ' ')}"*`).join(' AND ');
   const rows = getDb().prepare(`
     SELECT slug, title,
