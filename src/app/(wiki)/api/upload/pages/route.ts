@@ -3,7 +3,7 @@ import { writePageContentParts } from '@/lib/data/page'
 import { AppError, AppErrorCode } from '@/lib/errors'
 import { parsePageMetadata } from '@/lib/types'
 import type { NextRequest } from 'next/server'
-import { after } from 'node:test'
+import { after } from "next/server"
 import * as indexer from "@/lib/search/indexer"
 import * as searchDb from "@/lib/search/db"
 
