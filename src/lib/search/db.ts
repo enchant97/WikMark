@@ -107,7 +107,7 @@ export function getSearchResults(query: string, limit: number): SearchResult[] {
     })
     .join(' AND ')
 
-  const rows = getDb().prepare(`
+  const rows = getDb().prepare<unknown[], SearchResult>(`
     SELECT slug, title,
            snippet(pages_fts, 2, ?, ?, '…', 12) AS excerpt,
            rank
@@ -118,7 +118,6 @@ export function getSearchResults(query: string, limit: number): SearchResult[] {
   `).all(MARK_START, MARK_END, ftsQuery, limit)
   return rows.map(r => ({
     ...r,
-    title: r.title,
     excerpt: r.excerpt
       .replaceAll(MARK_START, "")
       .replaceAll(MARK_END, ""),

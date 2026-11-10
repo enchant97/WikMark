@@ -107,13 +107,21 @@ export async function renderMarkdown(md: string | Buffer<ArrayBuffer>, ctx: {
     .process(md))
 }
 
+/**
+ * Extract YAML frontmatter from a markdown file
+ *
+ * Returns the markdown content and frontmatter data
+ */
 export function extractFrontmatter(md: string | Buffer<ArrayBuffer>) {
-  let f = new VFile(md)
+  const f = new VFile(md)
   matter(f, { strip: true })
   return { content: String(f), data: f.data.matter }
 }
 
-export function combineFrontmatter(md: string, frontmatter: Object) {
+/**
+ * Combine YAML frontmatter with markdown content.
+ */
+export function combineFrontmatter(md: string, frontmatter: object) {
   const rawFrontmatter = stringify(frontmatter)
   return `---\n${rawFrontmatter}---\n${md}`
 }
