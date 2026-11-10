@@ -1,8 +1,7 @@
 import env from "@/env";
 import * as fs from "node:fs/promises";
 import path from "node:path";
-import { isValidPageSlugPart, renderToIndexable } from "@/lib/helpers";
-import matter from "gray-matter";
+import { isValidPageSlugPart, renderToIndexable, extractFrontmatter } from "@/lib/helpers";
 import { PageContentParts } from "@/lib/data/page";
 import { PageMetadata, parsePageMetadata } from "@/lib/types";
 
@@ -47,7 +46,7 @@ export function indexPageFromNew(slug: string, metadata: PageMetadata): IndexedP
 
 export async function indexPagePath(pagePath: string): Promise<IndexedPage> {
   const rawContent = await fs.readFile(pagePath)
-  const { content, data } = matter(rawContent)
+  const { content, data } = extractFrontmatter(rawContent)
   const metadata = parsePageMetadata(data)
   return await indexPageFromParts(pathToSlug(pagePath), { content, metadata })
 }
