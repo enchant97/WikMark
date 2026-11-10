@@ -186,7 +186,7 @@ export async function getPageContentParts(fullSlug: string): Promise<PageContent
  */
 export async function writePageContentParts(fullSlug: string, contentParts: PageContentParts) {
   const contentRaw = combineFrontmatter(contentParts.content, contentParts.metadata)
-  writePageContentRaw(fullSlug, contentRaw)
+  await writePageContentRaw(fullSlug, contentRaw)
 }
 
 /**
