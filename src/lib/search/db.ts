@@ -32,8 +32,10 @@ function getDb() {
       title TEXT NOT NULL,
       content TEXT NOT NULL,
       parentSlug TEXT GENERATED ALWAYS AS (
-        CASE WHEN instr(slug, '/') = 0 THEN ''
-             ELSE rtrim(rtrim(slug, replace(slug, '/', '')), '/')
+        CASE
+          WHEN slug = '' THEN NULL
+          WHEN instr(slug, '/') = 0 THEN ''
+          ELSE rtrim(rtrim(slug, replace(slug, '/', '')), '/')
         END
       ) VIRTUAL
     )
