@@ -1,6 +1,6 @@
 import Database from "better-sqlite3"
 import env from "@/env"
-import { discoverPagePaths, IndexedPage, indexPagePath } from "./indexer"
+import { DiscoveredPagePath, discoverPagePaths, IndexedPage, indexPageDirPath, indexPageFilePath } from "./indexer"
 import { PageMetadata } from "@/lib/types"
 
 const MAX_SQ_LENGTH = 256
@@ -219,9 +219,18 @@ export function updateIndexedPageMetadata(slug: string, metadata: PageMetadata) 
   stmt.run({ slug, title: metadata?.title ?? slug })
 }
 
-async function reIndexPagePath(pagePath: string) {
-  const indexedPage = await indexPagePath(pagePath)
-  updateIndexedPage(indexedPage)
+async function reIndexPagePath(discoveredPage: DiscoveredPagePath) {
+  if (discoveredPage.type === "file") {
+    const indexedPage = await indexPageFilePath(discoveredPage.path)
+    updateIndexedPage(indexedPage)
+  } else if (discoveredPage.type === "dir") {
+    const indexedPage = indexPageDirPath(discoveredPage.path)
+    const db = getDb()
+    const stmt = db.prepare(
+      "INSERT OR IGNORE INTO pages (slug, title, content) VALUES (@slug, @title, @content)"
+    )
+    stmt.run(indexedPage)
+  }
 }
 
 export async function rebuildIndex() {
@@ -255,10 +264,10 @@ export async function rebuildIndex() {
 
   console.log("rebulding search index")
   updateConfigStmt.run({ key: "isPending", value: "true" })
-  db.exec("DELETE FROM pages_fts")
+  db.exec("DELETE FROM pages")
   const pagePaths = discoverPagePaths()
   for await (const pagePath of pagePaths) {
-    console.log(`indexing: '${pagePath}'`)
+    console.log(`indexing: '${pagePath.path}'`)
     await reIndexPagePath(pagePath)
   }
   updateConfigStmt.run({ key: "createdAt", value: (new Date()).toISOString() })
