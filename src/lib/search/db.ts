@@ -20,20 +20,61 @@ function getDb() {
     db?.close()
   })
   db.pragma("journal_mode = WAL")
-  db.exec(`
+  db.transaction(() => {
+    if (db === null) {
+      throw new Error("db connection not set")
+    }
+    // pages table
+    db.exec(`
+    CREATE TABLE IF NOT EXISTS pages (
+      id INTEGER PRIMARY KEY,
+      slug TEXT NOT NULL UNIQUE,
+      title TEXT NOT NULL,
+      content TEXT NOT NULL,
+      parentSlug TEXT GENERATED ALWAYS AS (
+        CASE WHEN instr(slug, '/') = 0 THEN ''
+             ELSE rtrim(rtrim(slug, replace(slug, '/', '')), '/')
+        END
+      ) VIRTUAL
+    )
+  `)
+    db.exec("CREATE INDEX IF NOT EXISTS idx_pages_parent_slug ON pages(parentSlug, slug)")
+    // pages FTS table
+    db.exec(`
     CREATE VIRTUAL TABLE IF NOT EXISTS pages_fts USING fts5(
-      slug UNINDEXED,
       title,
       content,
+      content = 'pages', content_rowid = 'id',
       tokenize = 'porter unicode61'
     )
   `)
-  db.exec(`
+    // after insert trigger
+    db.exec(`
+    CREATE TRIGGER IF NOT EXISTS pages_ai AFTER INSERT ON pages BEGIN
+      INSERT INTO pages_fts(rowid, title, content) VALUES (new.id, new.title, new.content);
+    END
+  `)
+    // after delete trigger
+    db.exec(`
+    CREATE TRIGGER IF NOT EXISTS pages_ad AFTER DELETE ON pages BEGIN
+      INSERT INTO pages_fts(pages_fts, rowid, title, content) VALUES ('delete', old.id, old.title, old.content);
+    END
+  `)
+    // after update trigger
+    db.exec(`
+    CREATE TRIGGER IF NOT EXISTS pages_au AFTER UPDATE ON pages BEGIN
+      INSERT INTO pages_fts(pages_fts, rowid, title, content) VALUES ('delete', old.id, old.title, old.content);
+      INSERT INTO pages_fts(rowid, title, content) VALUES (new.id, new.title, new.content);
+    END
+  `)
+    // index config table
+    db.exec(`
     CREATE TABLE IF NOT EXISTS pages_config(
       key TEXT PRIMARY KEY,
       value TEXT
     )
   `)
+  })()
   if (process.env.NODE_ENV !== "production") {
     // only set for when hot-reload is used
     globalForDb.__search_db = db
@@ -108,12 +149,13 @@ export function getSearchResults(query: string, limit: number): SearchResult[] {
     .join(' AND ')
 
   const rows = getDb().prepare<unknown[], SearchResult>(`
-    SELECT slug, title,
-           snippet(pages_fts, 2, ?, ?, '…', 12) AS excerpt,
-           rank
+    SELECT p.slug, p.title,
+           snippet(pages_fts, 1, ?, ?, '…', 12) AS excerpt,
+           pages_fts.rank
     FROM pages_fts
+    JOIN pages p ON p.id = pages_fts.rowid
     WHERE pages_fts MATCH ?
-    ORDER BY rank
+    ORDER BY pages_fts.rank
     LIMIT ?
   `).all(MARK_START, MARK_END, ftsQuery, limit)
   return rows.map(r => ({
@@ -129,12 +171,12 @@ export function deleteIndexedPage(slug: string, options: { children: boolean } =
   const db = getDb()
   if (options.children) {
     const deletePage = db.prepare(
-      "DELETE FROM pages_fts WHERE slug = ? OR slug LIKE ? ESCAPE '\\'"
+      "DELETE FROM pages WHERE slug = ? OR slug LIKE ? ESCAPE '\\'"
     )
     deletePage.run(slug, escapeLike(slug) + "/%")
   } else {
     const deletePage = db.prepare(
-      "DELETE FROM pages_fts WHERE slug = ?"
+      "DELETE FROM pages WHERE slug = ?"
     )
     deletePage.run(slug)
   }
@@ -143,9 +185,9 @@ export function deleteIndexedPage(slug: string, options: { children: boolean } =
 export function renameIndexedPage(oldSlug: string, newSlug: string) {
   const db = getDb()
   const rows = db.prepare(
-    "SELECT slug FROM pages_fts WHERE slug = ? OR slug LIKE ? ESCAPE '\\'"
+    "SELECT slug FROM pages WHERE slug = ? OR slug LIKE ? ESCAPE '\\'"
   ).all(oldSlug, escapeLike(oldSlug) + "/%") as { slug: string }[]
-  const rename = db.prepare("UPDATE pages_fts SET slug = ? WHERE slug = ?")
+  const rename = db.prepare("UPDATE pages SET slug = ? WHERE slug = ?")
   const tx = db.transaction(() => {
     for (const { slug } of rows) {
       const updated = slug === oldSlug ? newSlug : newSlug + slug.slice(oldSlug.length)
@@ -158,7 +200,7 @@ export function renameIndexedPage(oldSlug: string, newSlug: string) {
 export function updateIndexedPage(indexedPage: IndexedPage) {
   const db = getDb()
   const insertIndexedPage = db.prepare(
-    "INSERT INTO pages_fts (slug, title, content) VALUES (@slug, @title, @content)"
+    "INSERT INTO pages (slug, title, content) VALUES (@slug, @title, @content)"
   )
   const tx = db.transaction(() => {
     deleteIndexedPage(indexedPage.slug, { children: false })
@@ -170,7 +212,7 @@ export function updateIndexedPage(indexedPage: IndexedPage) {
 export function updateIndexedPageMetadata(slug: string, metadata: PageMetadata) {
   const db = getDb()
   const stmt = db.prepare(
-    "UPDATE pages_fts SET title = @title WHERE slug = @slug"
+    "UPDATE pages SET title = @title WHERE slug = @slug"
   )
   stmt.run({ slug, title: metadata?.title ?? slug })
 }
