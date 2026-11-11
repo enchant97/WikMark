@@ -13,18 +13,20 @@ import SearchButton from './DrawerSearchButton';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import Header from '@/components/Header';
+import { type PageTreeEntry } from '@/lib/search/db';
 
 const drawerWidth = 240;
 
 interface Props extends PropsWithChildren {
+  parentTitle: string
   slugParts: string[]
-  relPageSlugs: Promise<string[]>
+  relPageTree: Promise<PageTreeEntry[]>
 }
 
 export default function WikiDrawer(props: Props) {
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [isClosing, setIsClosing] = React.useState(false);
-  const relPageSlugs = use(props.relPageSlugs)
+  const relPageTree = use(props.relPageTree)
 
   const handleDrawerClose = () => {
     setIsClosing(true);
@@ -52,7 +54,11 @@ export default function WikiDrawer(props: Props) {
         </Form>
       </Toolbar>
       <Divider />
-      <WikiDrawerTree relSlugs={relPageSlugs} slugParts={props.slugParts} />
+      <WikiDrawerTree
+        parentTitle={props.parentTitle}
+        relPageTree={relPageTree}
+        slugParts={props.slugParts}
+      />
     </div>
   );
 

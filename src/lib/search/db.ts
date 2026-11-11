@@ -169,6 +169,23 @@ export function getSearchResults(query: string, limit: number): SearchResult[] {
   }))
 }
 
+export function getPageTitle(slug: string): string | undefined {
+  const db = getDb()
+  const stmt = db.prepare<unknown[], string>("SELECT title FROM pages WHERE slug = ?")
+  return stmt.pluck().get(slug)
+}
+
+export interface PageTreeEntry {
+  slug: string
+  title: string
+}
+
+export function getPageTree(currentSlug: string): PageTreeEntry[] {
+  const db = getDb()
+  const getPagesStmt = db.prepare<unknown[], PageTreeEntry>("SELECT slug, title FROM pages WHERE parentSlug = ?")
+  return getPagesStmt.all(currentSlug)
+}
+
 export function deleteIndexedPage(slug: string, options: { children: boolean } = { children: true }) {
   const db = getDb()
   if (options.children) {

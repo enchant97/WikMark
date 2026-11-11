@@ -6,13 +6,15 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from "@mui/material/ListItemIcon";
 import SubdirectoryArrowLeftIcon from '@mui/icons-material/SubdirectoryArrowLeft';
 import ListItemText from "@mui/material/ListItemText";
+import { type PageTreeEntry } from "@/lib/search/db";
 
 interface Props {
-  relSlugs: string[]
+  parentTitle: string
+  relPageTree: PageTreeEntry[]
   slugParts: string[]
 }
 
-export default function WikiDrawerTree({ relSlugs, slugParts }: Props) {
+export default function WikiDrawerTree({ parentTitle, relPageTree, slugParts }: Props) {
   return (
     <List
       component="nav"
@@ -25,16 +27,16 @@ export default function WikiDrawerTree({ relSlugs, slugParts }: Props) {
             href={`/-/${joinSlugParts(slugParts.slice(0, -1))}`}
           >
             <ListItemIcon><SubdirectoryArrowLeftIcon /></ListItemIcon>
-            <ListItemText primary={slugParts.at(-2) ?? "Home"} />
+            <ListItemText primary={parentTitle === "" ? (slugParts.length === 0 ? "Home" : slugParts.at(-1)) : parentTitle} />
           </ListItemButton>
         </ListItem>
       )}
-      {relSlugs.map(slug => (
+      {relPageTree.map(({ slug, title }) => (
         <ListItem key={slug}>
           <ListItemButton
             LinkComponent={NextLink}
-            href={`/-/${joinSlugParts([...slugParts, slug])}`}
-          ><ListItemText primary={slug} /></ListItemButton>
+            href={`/-/${slug}`}
+          ><ListItemText primary={title || slug.slice(slug.lastIndexOf("/") + 1)} /></ListItemButton>
         </ListItem>
       ))}
     </List>

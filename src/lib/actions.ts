@@ -12,6 +12,7 @@ import * as searchDb from "@/lib/search/db"
 import { PageMetadata, parseReaderSettings } from "@/lib/types"
 import { redirect } from "next/navigation"
 import env from "@/env"
+import { isValidPageSlugFull } from "@/lib/helpers"
 
 async function isAuthenticated(): Promise<boolean> {
   return (await auth.api.getSession({ headers: await headers() })) !== null
@@ -19,6 +20,13 @@ async function isAuthenticated(): Promise<boolean> {
 
 function throwUnauthorized(): never {
   throw new AppError("this action requires an account", AppErrorCode.Unauthorized)
+}
+
+export async function getRelPageTree(parentSlug: string): Promise<searchDb.PageTreeEntry[]> {
+  if (!isValidPageSlugFull(parentSlug, { allowIndex: true })) {
+    throw new AppError(`invalid slug given: '${parentSlug}'`, AppErrorCode.Validation)
+  }
+  return searchDb.getPageTree(parentSlug)
 }
 
 export async function getRelPageSlugs(parentSlug: string): Promise<string[]> {
