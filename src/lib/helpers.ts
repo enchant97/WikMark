@@ -43,6 +43,8 @@ export function isValidAssetSlugPart(slug: string): boolean {
 export function isValidPageSlugFull(slug: string, options?: { allowIndex?: boolean }): boolean {
   if (slug === "" && options?.allowIndex) { return true }
   const parts = slug.split("/")
+  // special _index is reserved, and should not exist as parent to root
+  if (parts.at(0) === "_index") { return false }
   for (const part of parts) {
     if (!isValidPageSlugPart(part)) { return false }
   }
@@ -52,6 +54,8 @@ export function isValidPageSlugFull(slug: string, options?: { allowIndex?: boole
 export function isValidAssetSlugFull(slug: string): boolean {
   const parts = slug.split("/")
   const end = parts.pop()
+  // special _index is reserved, and should not exist as parent to root
+  if (parts.length !== 0 && parts.at(0) === "_index") { return false }
   for (const part of parts) {
     if (!isValidPageSlugPart(part)) { return false }
   }
