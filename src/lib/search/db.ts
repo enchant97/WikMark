@@ -212,14 +212,14 @@ export function renameIndexedPage(oldSlug: string, newSlug: string) {
   const insertIndexedDir = db.prepare("INSERT OR IGNORE INTO pages (slug, title, content) VALUES (@slug, '', '')")
   const parentParts = newSlug.split("/").slice(undefined, -1)
   const tx = db.transaction(() => {
-    // ensure parent directories are created
-    for (let index = 0; index < parentParts.length + 1; index++) {
-      insertIndexedDir.run({ slug: parentParts.slice(undefined, index).join("/") })
-    }
     // rename all existing pages
     for (const { slug } of rows) {
       const updated = slug === oldSlug ? newSlug : newSlug + slug.slice(oldSlug.length)
       rename.run(updated, slug)
+    }
+    // ensure all parent directories are created/exists
+    for (let index = 0; index < parentParts.length + 1; index++) {
+      insertIndexedDir.run({ slug: parentParts.slice(undefined, index).join("/") })
     }
   })
   tx()
