@@ -25,16 +25,12 @@ export interface DiscoveredPagePath {
 }
 
 export async function* discoverPagePaths(): AsyncIterableIterator<DiscoveredPagePath> {
-  const root = path.resolve(env.WIKI_PATH)
   const results = fs.glob("**", {
     cwd: env.WIKI_PATH,
     withFileTypes: true,
     exclude: (entry: Dirent) => entry.isDirectory() && !isValidPageSlugPart(entry.name),
   })
   for await (const entry of results) {
-    const fullPath = path.join(entry.parentPath, entry.name)
-    // skip root
-    if (fullPath === root) continue
     if (entry.isDirectory()) {
       yield { type: "dir", path: path.join(entry.parentPath, entry.name) }
     } else if (
