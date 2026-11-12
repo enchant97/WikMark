@@ -28,9 +28,9 @@ export async function* discoverPagePaths(): AsyncIterableIterator<DiscoveredPage
   const results = fs.glob("**", {
     cwd: env.WIKI_PATH,
     withFileTypes: true,
-    exclude: (entry: Dirent) => entry.isDirectory() && !isValidPageSlugPart(entry.name),
+    exclude: (entry: Dirent) => entry.isDirectory() && !isValidPageSlugPart(entry.name) && entry.name !== "_index",
   })
-  for await (const entry of results) {
+  for await (const entry of results as AsyncIterable<Dirent>) {
     if (entry.isDirectory()) {
       yield { type: "dir", path: path.join(entry.parentPath, entry.name) }
     } else if (
