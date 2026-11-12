@@ -3,6 +3,8 @@ import env from "@/env"
 import { DiscoveredPagePath, discoverPagePaths, IndexedPage, indexPageDirPath, indexPageFilePath } from "./indexer"
 import { PageMetadata } from "@/lib/types"
 
+const CURRENT_DB_VERSION = "2"
+
 const MAX_SQ_LENGTH = 256
 const MAX_SQ_TERMS = 8
 const MAX_SQ_TERM_LENGTH = 50
@@ -269,7 +271,7 @@ export async function rebuildIndex() {
   } else if (createdAt > (new Date()).toISOString()) {
     console.log("index created in future, rebuild required")
     rebuildRequired = true
-  } else if (version !== "1") {
+  } else if (version !== CURRENT_DB_VERSION) {
     console.log("index version incorrect, rebuild required")
     rebuildRequired = true
   }
@@ -288,6 +290,6 @@ export async function rebuildIndex() {
     await reIndexPagePath(pagePath)
   }
   updateConfigStmt.run({ key: "createdAt", value: (new Date()).toISOString() })
-  updateConfigStmt.run({ key: "version", value: "1" })
+  updateConfigStmt.run({ key: "version", value: CURRENT_DB_VERSION })
   updateConfigStmt.run({ key: "isPending", value: "false" })
 }
