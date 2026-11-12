@@ -12,15 +12,19 @@ const MAX_SQ_TERM_LENGTH = 50
 const globalForDb = globalThis
 let db: Database.Database | null = globalForDb.__search_db ?? null
 
+process.on("exit", () => {
+  if (db !== null) {
+    console.debug("closing search index db")
+    db.close()
+    db = null
+  }
+})
+
 function getDb() {
   if (db !== null) {
     return db
   }
   db = new Database(env.SEARCH_DB_PATH)
-  process.on("exit", () => {
-    console.debug("closing search index db")
-    db?.close()
-  })
   db.pragma("journal_mode = WAL")
   db.transaction(() => {
     if (db === null) {
