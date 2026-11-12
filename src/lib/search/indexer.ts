@@ -16,7 +16,7 @@ function pathToSlug(p: string): string {
   const relPath = path.relative(env.WIKI_PATH, p)
   const parts = relPath.split(path.sep)
   const basename = path.basename(parts.pop()!, ".md")
-  return [...parts, basename === "_index" ? "" : basename].join("/")
+  return [...parts, (basename === "_index" && parts.length === 0) ? "" : basename].join("/")
 }
 
 export interface DiscoveredPagePath {
