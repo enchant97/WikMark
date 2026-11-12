@@ -29,6 +29,10 @@ Use this to discover pages from a search query.
     "slug": "",
     "title": "",
     "excerpt": "",
+    "segments": [
+        {"type": "text", content: ""},
+        {"type": "match", content: ""},
+    ],
     "rank": 0.0
 }
 ```
