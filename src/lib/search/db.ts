@@ -209,7 +209,14 @@ export function renameIndexedPage(oldSlug: string, newSlug: string) {
     "SELECT slug FROM pages WHERE slug = ? OR slug LIKE ? ESCAPE '\\'"
   ).all(oldSlug, escapeLike(oldSlug) + "/%") as { slug: string }[]
   const rename = db.prepare("UPDATE pages SET slug = ? WHERE slug = ?")
+  const insertIndexedDir = db.prepare("INSERT OR IGNORE INTO pages (slug, title, content) VALUES (@slug, '', '')")
+  const parentParts = newSlug.split("/").slice(undefined, -1)
   const tx = db.transaction(() => {
+    // ensure parent directories are created
+    for (let index = 0; index < parentParts.length + 1; index++) {
+      insertIndexedDir.run({ slug: parentParts.slice(undefined, index).join("/") })
+    }
+    // rename all existing pages
     for (const { slug } of rows) {
       const updated = slug === oldSlug ? newSlug : newSlug + slug.slice(oldSlug.length)
       rename.run(updated, slug)
@@ -223,8 +230,17 @@ export function updateIndexedPage(indexedPage: IndexedPage) {
   const insertIndexedPage = db.prepare(
     "INSERT INTO pages (slug, title, content) VALUES (@slug, @title, @content)"
   )
+  const insertIndexedDir = db.prepare("INSERT OR IGNORE INTO pages (slug, title, content) VALUES (@slug, '', '')")
+  const parentParts = indexedPage.slug.split("/").slice(undefined, -1)
   const tx = db.transaction(() => {
+    // ensure parent directories are created
+    for (let index = 0; index < parentParts.length + 1; index++) {
+      insertIndexedDir.run({ slug: parentParts.slice(undefined, index).join("/") })
+    }
+    // overwrite any existing indexed page
+    // (going from a dir with no page to one with)
     deleteIndexedPage(indexedPage.slug, { children: false })
+    // insert actual page
     insertIndexedPage.run(indexedPage)
   })
   tx()
