@@ -8,6 +8,14 @@ import SubdirectoryArrowLeftIcon from '@mui/icons-material/SubdirectoryArrowLeft
 import ListItemText from "@mui/material/ListItemText";
 import { type PageTreeEntry } from "@/lib/search/db";
 
+function makeParentTitle(parentTitle: string, slugParts: string[]): string {
+  if (parentTitle !== "") {
+    return parentTitle
+  }
+  const parentSlug = slugParts.slice(0, -1).at(-1)
+  return parentSlug ?? "Home"
+}
+
 interface Props {
   parentTitle: string
   relPageTree: PageTreeEntry[]
@@ -27,7 +35,7 @@ export default function WikiDrawerTree({ parentTitle, relPageTree, slugParts }: 
             href={`/-/${joinSlugParts(slugParts.slice(0, -1))}`}
           >
             <ListItemIcon><SubdirectoryArrowLeftIcon /></ListItemIcon>
-            <ListItemText primary={parentTitle === "" ? (slugParts.length === 0 ? "Home" : slugParts.at(-1)) : parentTitle} />
+            <ListItemText primary={makeParentTitle(parentTitle, slugParts)} />
           </ListItemButton>
         </ListItem>
       )}
