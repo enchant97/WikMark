@@ -2,6 +2,7 @@ import Database from "better-sqlite3"
 import env from "@/env"
 import { DiscoveredPagePath, discoverPagePaths, IndexedPage, indexPageDirPath, indexPageFilePath } from "./indexer"
 import { PageMetadata } from "@/lib/types"
+import { unlink } from "node:fs/promises"
 
 const CURRENT_DB_VERSION = "2"
 
@@ -10,29 +11,29 @@ const MAX_SQ_TERMS = 8
 const MAX_SQ_TERM_LENGTH = 50
 
 const globalForDb = globalThis
-let db: Database.Database | null = globalForDb.__search_db ?? null
+let __db: Database.Database | null = globalForDb.__search_db ?? null
 
 process.on("exit", () => {
-  if (db !== null) {
-    console.debug("closing search index db")
-    db.close()
-    db = null
-  }
+  closeDb()
 })
 
-function getDb() {
-  if (db !== null) {
-    return db
-  }
-  db = new Database(env.SEARCH_DB_PATH)
-  db.pragma("journal_mode = WAL")
-  db.transaction(() => {
-    if (db === null) {
-      throw new Error("db connection not set")
+function closeDb() {
+  if (__db !== null) {
+    console.debug("closing search index db")
+    __db.close()
+    __db = null
+    if (process.env.NODE_ENV !== "production") {
+      // only set for when hot-reload is used
+      globalForDb.__search_db = null
     }
+  }
+}
+
+function createTables(db: Database.Database) {
+  db.transaction(() => {
     // pages table
     db.exec(`
-    CREATE TABLE IF NOT EXISTS pages (
+    CREATE TABLE pages (
       id INTEGER PRIMARY KEY,
       slug TEXT NOT NULL UNIQUE,
       title TEXT NOT NULL,
@@ -46,10 +47,10 @@ function getDb() {
       ) VIRTUAL
     )
   `)
-    db.exec("CREATE INDEX IF NOT EXISTS idx_pages_parent_slug ON pages(parentSlug, slug)")
+    db.exec("CREATE INDEX idx_pages_parent_slug ON pages(parentSlug, slug)")
     // pages FTS table
     db.exec(`
-    CREATE VIRTUAL TABLE IF NOT EXISTS pages_fts USING fts5(
+    CREATE VIRTUAL TABLE pages_fts USING fts5(
       title,
       content,
       content = 'pages', content_rowid = 'id',
@@ -58,42 +59,53 @@ function getDb() {
   `)
     // after insert trigger
     db.exec(`
-    CREATE TRIGGER IF NOT EXISTS pages_ai AFTER INSERT ON pages BEGIN
+    CREATE TRIGGER pages_ai AFTER INSERT ON pages BEGIN
       INSERT INTO pages_fts(rowid, title, content) VALUES (new.id, new.title, new.content);
     END
   `)
     // after delete trigger
     db.exec(`
-    CREATE TRIGGER IF NOT EXISTS pages_ad AFTER DELETE ON pages BEGIN
+    CREATE TRIGGER pages_ad AFTER DELETE ON pages BEGIN
       INSERT INTO pages_fts(pages_fts, rowid, title, content) VALUES ('delete', old.id, old.title, old.content);
     END
   `)
     // after update trigger
     db.exec(`
-    CREATE TRIGGER IF NOT EXISTS pages_au AFTER UPDATE ON pages BEGIN
+    CREATE TRIGGER pages_au AFTER UPDATE ON pages BEGIN
       INSERT INTO pages_fts(pages_fts, rowid, title, content) VALUES ('delete', old.id, old.title, old.content);
       INSERT INTO pages_fts(rowid, title, content) VALUES (new.id, new.title, new.content);
     END
   `)
     // index config table
     db.exec(`
-    CREATE TABLE IF NOT EXISTS pages_config(
+    CREATE TABLE pages_config(
       key TEXT PRIMARY KEY,
       value TEXT
     )
   `)
   })()
+}
+
+/**
+ * Get the database connection,
+ * by either creating or using the existing one.
+ */
+function getDb() {
+  if (__db !== null) {
+    return __db
+  }
+  __db = new Database(env.SEARCH_DB_PATH)
+  __db.pragma("journal_mode = WAL")
   if (process.env.NODE_ENV !== "production") {
     // only set for when hot-reload is used
-    globalForDb.__search_db = db
+    globalForDb.__search_db = __db
   }
-  return db
+  return __db
 }
 
 function escapeLike(s: string) {
   return s.replace(/[\\%_]/g, (c) => '\\' + c)
 }
-
 
 export interface MatchSegment {
   type: "text" | "match"
@@ -272,14 +284,40 @@ async function reIndexPagePath(discoveredPage: DiscoveredPagePath) {
   }
 }
 
-export async function rebuildIndex() {
-  const db = getDb()
-  const updateConfigStmt = db.prepare("INSERT OR REPLACE INTO pages_config(key, value) VALUES (@key, @value)")
-  const getConfigStmt = db.prepare("SELECT value FROM pages_config WHERE key = ?").pluck()
+function getIndexDetails(db: Database.Database) {
+  const getConfigStmt = db.prepare<unknown[], string | undefined>("SELECT value FROM pages_config WHERE key = ?").pluck()
+  const createdAt = getConfigStmt.get("createdAt")
+  const version = getConfigStmt.get("version")
+  const isPending = getConfigStmt.get("isPending")
+  return {
+    createdAt,
+    version,
+    isPending,
+  }
+}
 
-  const createdAt = getConfigStmt.get("createdAt") as string | undefined
-  const version = getConfigStmt.get("version") as string | undefined
-  const isPending = getConfigStmt.get("isPending") as string | undefined
+async function reIndex(db: Database.Database) {
+  const updateConfigStmt = db.prepare("INSERT OR REPLACE INTO pages_config(key, value) VALUES (@key, @value)")
+  console.log("rebulding search index")
+  updateConfigStmt.run({ key: "isPending", value: "true" })
+  db.exec("DELETE FROM pages")
+  const pagePaths = discoverPagePaths()
+  for await (const pagePath of pagePaths) {
+    console.log(`indexing: '${pagePath.path}'`)
+    await reIndexPagePath(pagePath)
+  }
+  updateConfigStmt.run({ key: "createdAt", value: (new Date()).toISOString() })
+  updateConfigStmt.run({ key: "version", value: CURRENT_DB_VERSION })
+  updateConfigStmt.run({ key: "isPending", value: "false" })
+}
+
+export async function rebuildIndex() {
+  if (!getDb().prepare("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ?").get("pages_config")) {
+    console.log("init index database")
+    createTables(getDb())
+  }
+
+  const { createdAt, version, isPending } = getIndexDetails(getDb())
 
   let rebuildRequired = false
   if (isPending === "true") {
@@ -301,15 +339,8 @@ export async function rebuildIndex() {
     return
   }
 
-  console.log("rebulding search index")
-  updateConfigStmt.run({ key: "isPending", value: "true" })
-  db.exec("DELETE FROM pages")
-  const pagePaths = discoverPagePaths()
-  for await (const pagePath of pagePaths) {
-    console.log(`indexing: '${pagePath.path}'`)
-    await reIndexPagePath(pagePath)
-  }
-  updateConfigStmt.run({ key: "createdAt", value: (new Date()).toISOString() })
-  updateConfigStmt.run({ key: "version", value: CURRENT_DB_VERSION })
-  updateConfigStmt.run({ key: "isPending", value: "false" })
+  closeDb()
+  await unlink(env.SEARCH_DB_PATH)
+  createTables(getDb())
+  await reIndex(getDb())
 }
